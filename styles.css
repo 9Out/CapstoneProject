@@ -1,0 +1,136 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('siwal.jpg');
+    background-size: cover;
+    background-position: center;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e3a8a;
+    padding: 5px 20px;
+    color: white;
+    border-bottom: 5px solid #f4c430;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-container a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 80px;
+    margin-right: 10px;
+}
+
+.university-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.university-text span:first-child {
+    font-size: 30px;
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+}
+
+.button-group button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    margin: 0 5px;
+    font-size: 20px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.button-group button.beranda {
+    color: #f4c430;
+}
+
+.button-group .user-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.user-icon {
+    width: 35px;
+    height: 35px;
+}
+
+.judul{
+    margin: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 50px;
+    color: #1e3a8a;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 35px;
+    color: #1e3a8a;
+    margin-bottom: 20px;
+}
+
+main {
+    background-color: white;
+
+    height: 500px;
+    margin: 20px;
+    padding: 50px;
+    text-align: center;
+}
+
+section {
+    margin-bottom: 20px;
+    text-align: left;
+    padding: 10px 15px;
+    border-radius: 5px;
+  }
+
+  .announcement {
+    background-color: #fff9c4;
+  }
+
+  .events {
+    background-color: #dcedc8;
+  }
+
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  li {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
