@@ -1,0 +1,96 @@
+ 
+  .main-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .calendar-section {
+    background: white;
+    padding: 20px;
+    flex: 1;
+    border-radius: 8px;
+    box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  }
+  
+  .calendar-section h2 {
+    text-align: center;
+    color: #1e3a8a;
+  }
+  
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .nav-arrows button {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    margin-left: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 4px 8px;
+  }
+  
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-top: 10px;
+    gap: 5px;
+  }
+  
+  .day-name {
+    font-weight: bold;
+    text-align: center;
+    color: #1e3a8a;
+  }
+  
+  .day {
+    background: #e5edf7;
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  
+  .day.red {
+    color: red;
+  }
+  
+  .day.inactive {
+    color: #ccc;
+  }
+  
+  .agenda-section {
+    background: white;
+    flex: 0.6;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  }
+  
+  .search-box {
+    width: 100%;
+    padding: 6px 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .agenda-item {
+    border-top: 1px solid #ccc;
+    padding: 10px 0;
+    position: relative;
+  }
+  
+  .agenda-item .icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: #1e3a8a;
+    padding: 4px 6px;
+    border-radius: 4px;
+  }
+  

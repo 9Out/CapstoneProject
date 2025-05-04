@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Tentang Kami{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'aboutUs/css/styles-about.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="content">
+        <h1>📘 Tentang Kami</h1>
+        <p>Sistem Informasi Kalender Akademik UMS adalah platform berbasis website yang dikembangkan untuk memudahkan seluruh civitas akademika Universitas Muhammadiyah Surakarta dalam mengakses informasi kalender akademik secara cepat, akurat, dan interaktif.</p>
+        <p>Melalui sistem ini, pengguna dapat mengetahui jadwal penting seperti:</p>
+        <ul>
+            <li>Awal dan akhir perkuliahan</li>
+            <li>Jadwal UTS dan UAS</li>
+            <li>Pengisian KRS dan KHS</li>
+            <li>Hari libur nasional dan cuti bersama</li>
+            <li>Kegiatan akademik lainnya</li>
+        </ul>
+        <div class="contact">
+            <p><strong>Kontak</strong></p>
+            <p>Untuk saran dan pertanyaan, silakan hubungi:</p>
+            <p><a href="mailto:bioakademik@ums.ac.id">bioakademik@ums.ac.id</a></p>
+            <p><a href="https://www.ums.ac.id" target="_blank">www.ums.ac.id</a></p>
+        </div>
+    </div>
+{% endblock %}

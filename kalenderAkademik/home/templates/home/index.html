@@ -1,30 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMS Portal Informasi Kalender Akademik</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="navbar">
-        <div class="logo-container">
-            <a href="index.html">
-                <img src="logo.png" alt="UMS Logo" class="logo">
-                <div class="university-text">
-                    <span>UMS</span>
-                    <span>Universitas Muhammadiyah Surakarta</span>
-                </div>
-            </a>
-        </div>
-        <div class="button-group">
-            <button class="beranda">Beranda</button>
-            <button class="kaldik">Kalender Akademik</button>
-            <a href="about.html"><button class="tentang">Tentang</button></a>
-            <button class="user-btn"><img src="user.png" alt="User Icon" class="user-icon"></button>
-        </div>
-    </div>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Portal Informasi Kalender Akademik UMS{% endblock %}
 
+{% block extra_head %}
+    <!-- <link rel="stylesheet" href="{% static 'home/css/styles-index.css' %}"> -->
+    <style>
+      body{
+        background-image: url("{% static 'assets/siwal.jpg'%}");
+      }
+    </style>
+{% endblock %}
+
+
+{% block content %}
     <div class="judul">
         <h1>Portal Informasi Kalender Akademik UMS</h1>
         <p>Portal ini merupakan sistem informasi berbasis web yang menyediakan akses cepat dan terpusat terhadap seluruh jadwal akademik resmi Universitas Muhammadiyah Surakarta.</p>
@@ -52,5 +40,4 @@
         </section>
       </main>
     <script src="script2.js"></script>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css'%}">
+     {% block extra_head %}
+    {% endblock %}
+</head>
+<body>
+    <!-- navbar -->
+    <div class="navbar">
+        <div class="logo-container">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'assets/logo.png'%}" alt="UMS Logo" class="logo">
+                <div class="university-text">
+                    <span>UMS</span>
+                    <span>Universitas Muhammadiyah Surakarta</span>
+                </div>
+            </a>
+        </div>
+        <div class="button-group">
+            <a href="{% url 'home' %}"><button>Beranda</button></a>
+            <a href="{% url 'kaldik' %}"><button>Kalender Akademik</button></a>
+            <a href="{% url 'about' %}"><button class="tentang">Tentang</button></a>
+            <button class="user-btn"><img src="{% static 'assets/user.png'%}" alt="User Icon" class="user-icon"></button>
+        </div>
+    </div>
+    <!-- endNavbar -->
+
+     <!-- content -->
+      {% block content %}
+      {% endblock %}
+     <!-- endContent -->
+
+    <!-- footer -->
+    <div style="background-color: #1e3a8a; color: white; text-align: center; padding: 10px 0; position: relative; bottom: 0; width: 100%;">
+        <p id="footer_child">&copy; 2025 Universitas Muhammadiyah Surakarta</p>
+        <p id="footer_child">Hidoep Joke Ouch Why</p>
+    </div>
+    <!-- endFooter -->
+
+
+</body>
+</html>
