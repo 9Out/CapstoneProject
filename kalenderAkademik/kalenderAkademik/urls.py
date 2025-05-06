@@ -22,5 +22,6 @@ urlpatterns = [
     path('', include('home.urls')),
     path('kalender/', include('kalender.urls')),
     path('about/', include('aboutUs.urls')),
+    path('auth/', include('userAuth.urls')),
 ]
 

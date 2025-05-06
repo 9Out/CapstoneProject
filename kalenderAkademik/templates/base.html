@@ -1,11 +1,11 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} {% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css'%}">
+    <link rel="icon" href="{% static 'assets/LOGO_HD.png' %}">
      {% block extra_head %}
     {% endblock %}
 </head>
@@ -13,7 +13,7 @@
     <!-- navbar -->
     <div class="navbar">
         <div class="logo-container">
-            <a href="{% url 'home' %}">
+            <a href="{% url 'home:home' %}">
                 <img src="{% static 'assets/logo.png'%}" alt="UMS Logo" class="logo">
                 <div class="university-text">
                     <span>UMS</span>
@@ -22,10 +22,17 @@
             </a>
         </div>
         <div class="button-group">
-            <a href="{% url 'home' %}"><button>Beranda</button></a>
-            <a href="{% url 'kaldik' %}"><button>Kalender Akademik</button></a>
+            <a href="{% url 'home:home' %}"><button>Beranda</button></a>
+            <a href="{% url 'kalender:kaldik' %}"><button>Kalender Akademik</button></a>
             <a href="{% url 'about' %}"><button class="tentang">Tentang</button></a>
-            <button class="user-btn"><img src="{% static 'assets/user.png'%}" alt="User Icon" class="user-icon"></button>
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'userAuth:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="user-btn"><img src="{% static 'assets/user.png'%}" alt="User Icon" class="user-icon"></button>
+            </form>
+            {% else %}
+            <a href="{% url 'userAuth:login'%}"><button class="user-btn"><img src="{% static 'assets/user.png'%}" alt="User Icon" class="user-icon"></button></a>
+            {% endif %}
         </div>
     </div>
     <!-- endNavbar -->

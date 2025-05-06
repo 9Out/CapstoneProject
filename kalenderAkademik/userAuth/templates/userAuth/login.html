@@ -1,23 +1,29 @@
-<!DOCTYPE html>
+{% load static%}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UMS Kalender Akademik Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{% static 'userAuth/css/styles.css'%}">
+    <link rel="icon" href="{% static 'assets/LOGO_HD.png' %}">
 </head>
 <body>
     <div class="login-container">
-        <img src="logo.png" alt="UMS Logo" class="logo">
+        <img src="../../static/userAuth/assets/logo.png" alt="UMS Logo" class="logo">
         <div class="welcome-text">
             Selamat datang di KALDIK<br>Kalender Akademik<br>Universitas Muhammadiyah Surakarta
         </div>
-        <input type="text" id="username" class="input-field" placeholder="Username">
-        <input type="password" id="password" class="input-field" placeholder="Password">
+        {% if form.errors %}
+        <p style="color: red;">Username/Email atau kata sandi salah. Silakan coba lagi.</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
         <div class="button-container">
             <button class="cas-btn">CAS</button>
-            <button class="login-btn" onclick="handleLogin()">Login</button>
+            <button class="login-btn" type="submit">Login</button>
         </div>
+        </form>
     </div>
     <script src="scripts.js"></script>
 </body>
