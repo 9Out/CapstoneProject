@@ -1,24 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMS Kalender Akademik Login</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Kaldik UMS</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="bg">
     <div class="login-container">
-        <img src="logo.png" alt="UMS Logo" class="logo">
-        <div class="welcome-text">
-            Selamat datang di KALDIK<br>Kalender Akademik<br>Universitas Muhammadiyah Surakarta
+      <div class="login-box">
+        <div class="left-logo">
+          <img src="logo.png" alt="Logo UMS" />
         </div>
-        <input type="text" id="username" class="input-field" placeholder="Username">
-        <input type="password" id="password" class="input-field" placeholder="Password">
-        <div class="button-container">
-            <button class="cas-btn">CAS</button>
-            <button class="login-btn" onclick="handleLogin()">Login</button>
+        <div class="right-form">
+          <h3>Selamat datang di <strong>KALDIK</strong></h3>
+          <p>Kalender Akademik<br>Universitas Muhammadiyah Surakarta</p>
+          <form>
+            <input type="text" placeholder="Username" required />
+            <input type="password" placeholder="Password" required />
+            <div class="button-group">
+              <button type="submit" class="btn yellow">Login</button>
+              <button type="button" class="btn blue">Login CAS</button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
-    <script src="scripts.js"></script>
+  </div>
 </body>
 </html>
