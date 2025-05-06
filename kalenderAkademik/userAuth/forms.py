@@ -7,7 +7,18 @@ class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
         label="Username atau Email",
         max_length=254,
-        widget=forms.TextInput(attrs={'autofocus': True}),
+        widget=forms.TextInput(attrs={
+            'autofocus': True,
+            'class': "input-field",
+            'placeholder': "Username atau Email",
+        }),
+    )
+    password = forms.CharField(
+        label="Kata Sandi",
+        widget=forms.PasswordInput(attrs={
+            'class': "input-field",
+            'placeholder': "Kata Sandi",
+        })
     )
 
     def clean(self):

@@ -23,4 +23,4 @@ class Custom_login(LoginView):
 #     else:
 #         form = CustomAuthForm()
 #
-#     return render(request, 'userAuth/login.html', {'form': form})
+#     return render(request, 'userAuth/log.html', {'form': form})

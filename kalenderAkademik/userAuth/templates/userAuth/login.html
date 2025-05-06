@@ -1,30 +1,48 @@
-{% load static%}
-<html lang="en">
+{% load static %}
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMS Kalender Akademik Login</title>
-    <link rel="stylesheet" href="{% static 'userAuth/css/styles.css'%}">
-    <link rel="icon" href="{% static 'assets/LOGO_HD.png' %}">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login Kaldik UMS</title>
+    <link rel="stylesheet" href="{% static 'userAuth/css/styles.css' %}"/>
+    <link rel="icon" type="icon" href="{% static 'assets/LOGO_HD.png' %}"/>
+    <style>
+        .bg {
+            background: url("{% static 'userAuth/assets/background.jpg' %}") no-repeat center center;
+            background-size: cover;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
+<div class="bg">
     <div class="login-container">
-        <img src="../../static/userAuth/assets/logo.png" alt="UMS Logo" class="logo">
-        <div class="welcome-text">
-            Selamat datang di KALDIK<br>Kalender Akademik<br>Universitas Muhammadiyah Surakarta
+        <div class="login-box">
+            <div class="left-logo">
+                <img src="{% static 'userAuth/assets/logo.png' %}" alt="Logo UMS"/>
+            </div>
+            <div class="right-form">
+                <h3>Selamat datang di <strong>KALDIK</strong></h3>
+                <p>Kalender Akademik<br>Universitas Muhammadiyah Surakarta</p>
+                {% if form.errors %}
+                <p style="color: red; font-size: 0.9rem;">Username/Email atau kata sandi salah.</p>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.username }}
+                    {{ form.password }}
+                    <div class="button-group">
+                        <button type="submit" class="btn yellow">Login</button>
+                        <button type="button" class="btn blue">Login CAS</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        {% if form.errors %}
-        <p style="color: red;">Username/Email atau kata sandi salah. Silakan coba lagi.</p>
-        {% endif %}
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-        <div class="button-container">
-            <button class="cas-btn">CAS</button>
-            <button class="login-btn" type="submit">Login</button>
-        </div>
-        </form>
     </div>
-    <script src="scripts.js"></script>
+</div>
 </body>
 </html>

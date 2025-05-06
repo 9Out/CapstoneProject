@@ -123,12 +123,15 @@ LOGOUT_REDIRECT_URL = 'userAuth:login'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Jakarta'
 
 USE_I18N = True
 
 USE_TZ = True
 
+DATE_FORMAT = 'Y-m-d'
+TIME_FORMAT = 'H:i'
+DATETIME_FORMAT = 'Y-m-d H:i'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
