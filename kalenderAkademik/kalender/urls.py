@@ -9,9 +9,9 @@ urlpatterns = [
     path('', views.kalender, name='kaldik'),
 ]
 
-router = DefaultRouter()
-router.register(r'kegiatan', KegiatanViewSet)
+# router = DefaultRouter()
+# router.register(r'kegiatan', KegiatanViewSet)
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+# urlpatterns = [
+#     path('', include(router.urls)),
+# ]

@@ -4,12 +4,19 @@ from django.db import models
 # from django.contrib.auth.models import User
 # Create your models here.
 
+class TahunAkademik(models.Model):
+    tahun_akademik = models.CharField(max_length=10)
+    def __str__(self):
+        return self.tahun_akademik
+
 class Kategori(models.Model):
     nama = models.CharField(max_length=25)
     def __str__(self):
         return self.nama
 
 class Kegiatan(models.Model):
+    tahun_akademik = models.ForeignKey(TahunAkademik, on_delete=models.CASCADE)
+    semester = models.CharField(choices=[('ganjil','Ganjil'),('genap','Genap')], max_length=20, default='ganjil')
     nama = models.CharField(max_length=50)
     deskripsi = models.CharField(max_length=254, blank=True, null=True)
     tgl_mulai = models.DateTimeField()
@@ -25,6 +32,8 @@ class Notifikasi(models.Model):
     user_fk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     kegiatan_fk = models.ForeignKey(Kegiatan, on_delete=models.CASCADE)
     pesan = models.CharField(max_length=254, blank=True, null=True)
+    metode = models.CharField(choices=[('email','Email'),('whatsapp','Whatsapp')], max_length=20, default='email')
+    status = models.CharField(choices=[('pending','Pending'),('terkirim','Terkirim'),('gagal','Gagal')], max_length=20, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
