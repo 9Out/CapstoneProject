@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'aboutUs',
     'kalender',
     'userAuth',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -78,15 +79,8 @@ WSGI_APPLICATION = 'kalenderAkademik.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'kalenderakademik',
-        'USER': 'root',
-        'PASSWORD' : '',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8',
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
