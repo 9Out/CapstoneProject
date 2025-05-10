@@ -1,43 +1,33 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Portal Informasi Kalender Akademik UMS{% endblock %}
 
-{% block extra_head %}
-    <!-- <link rel="stylesheet" href="{% static 'home/css/styles-index.css' %}"> -->
-    <style>
-      body{
-        background-image: url("{% static 'assets/siwal.jpg'%}");
-      }
-    </style>
+{% block title %}
+Home
 {% endblock %}
 
-
 {% block content %}
-    <div class="judul">
-        <h1>Portal Informasi Kalender Akademik UMS</h1>
-        <p>Portal ini merupakan sistem informasi berbasis web yang menyediakan akses cepat dan terpusat terhadap seluruh jadwal akademik resmi Universitas Muhammadiyah Surakarta.</p>
+<div class="home-container">
+    <header class="home-header" style="background-image: url('{% static 'assets/siwal.jpg' %}');">
+        <div class="home-judul">
+            <h1>Sistem Informasi Akademik UMS</h1>
+            <p>Website Resmi Sistem Informasi Akademik Universitas Muhammadiyah Surakarta</p>
+        </div>
+    </header>
+    <div class="home-main">
+        <div class="home-section announcement">
+            <h2>Pengumuman</h2>
+            <ul>
+                <li>Pengumuman 1: Pendaftaran semester baru dimulai tanggal 1 Juli 2025.</li>
+                <li>Pengumuman 2: Ujian akhir semester akan dilaksanakan pada 15-20 Desember 2025.</li>
+            </ul>
+        </div>
+        <div class="home-section events">
+            <h2>Kegiatan</h2>
+            <ul>
+                <li>Kegiatan 1: Seminar Nasional Teknologi Informasi, 25 November 2025.</li>
+                <li>Kegiatan 2: Pekan Olahraga Mahasiswa, 5-10 Desember 2025.</li>
+            </ul>
+        </div>
     </div>
-        
-    <main>
-        <!-- <h1>Portal Informasi Kalender Akademik UMS</h1>
-        <p>Portal ini merupakan sistem informasi berbasis web yang menyediakan akses cepat dan terpusat terhadap seluruh jadwal akademik resmi Universitas Muhammadiyah Surakarta.</p> -->
-        
-        <section class="announcement">
-          <h2>📢 Pengumuman:</h2>
-          <ul>
-            <li>- Perubahan jadwal UTS Fakultas Teknik dimulai 22 April 2025</li>
-            <li>- Batas akhir pengajuan cuti akademik: 20 April 2025</li>
-          </ul>
-        </section>
-    
-        <section class="events">
-          <h2>📅 Kegiatan Terdekat:</h2>
-          <ul>
-            <li>- Awal Perkuliahan Genap: 15 April 2025</li>
-            <li>- Batas Pengisian KRS: 25 April 2025</li>
-            <li>- Libur Nasional: 1 Mei 2025 (Hari Buruh)</li>
-          </ul>
-        </section>
-      </main>
-    <script src="script2.js"></script>
+</div>
 {% endblock %}

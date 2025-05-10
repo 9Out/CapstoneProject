@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Kalender Akademik UMS{% endblock %}
+{% block extra_head %}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+{% endblock %}
+{% block content %}
+    <div class="kalender-container">
+        <div class="kalender-main-container">
+            <div class="kalender-calendar-container">
+                <div id="calendar"></div>
+            </div>
+            <div class="kalender-agenda-section">
+                <h2>Agenda Akademik</h2>
+                <input type="text" id="search" placeholder="cari agenda..." onkeyup="filterAgenda()">
+                <div id="agenda-container"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // JavaScript tetap sama, hanya ubah kelas di HTML
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const agendaContainer = document.getElementById('agenda-container');
+            const datenow = new Date();
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                initialDate: datenow,
+                locale: 'id',
+                events: '/api/events/',
+                headerToolbar: {
+                    left: 'title',
+                    center: '',
+                    right: 'prev,next today'
+                },
+                buttonText: {
+                    today: 'Hari Ini',
+                },
+                eventClick: function (info) {
+                    alert('Agenda: ' + info.event.title + '\nTanggal: ' + info.event.start.toLocaleDateString('id-ID'));
+                },
+                height: 'auto',
+                datesSet: function (info) {
+                    const start = info.view.activeStart;
+                    const end = info.view.activeEnd;
+                    loadAgenda(start, end);
+                }
+            });
+            calendar.render();
+            window.addEventListener('resize', function () {
+                calendar.updateSize();
+            });
+            async function loadAgenda(start, end) {
+                const response = await fetch(`/api/events/?start=${start.toISOString()}&end=${end.toISOString()}`);
+                const eventsData = await response.json();
+                renderAgenda(eventsData);
+            }
+            function renderAgenda(agendaList) {
+                agendaContainer.innerHTML = '';
+                if (agendaList.length === 0) {
+                    agendaContainer.innerHTML = '<p>Tidak ada agenda yang sesuai dengan pencarian.</p>';
+                    return;
+                }
+                agendaList.forEach(agenda => {
+                    const startDate = new Date(agenda.start);
+                    const formattedDate = startDate.toLocaleDateString('id-ID', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    const agendaEl = document.createElement('div');
+                    agendaEl.className = 'kalender-agenda-item';
+                    agendaEl.style.borderLeftColor = agenda.backgroundColor;
+                    let bellButton = '';
+                    if ('{{ user.is_authenticated }}' === 'True') {
+                        bellButton = `<div class="kalender-btn-bell" onclick="showNotificationPopup('${agenda.title}', '${agenda.start}', ${agenda.id})">🔔</div>`;
+                    }
+                    agendaEl.innerHTML = `
+                        ${bellButton}
+                        <div class="kalender-agenda-item-title">${agenda.title}</div>
+                        <div class="kalender-agenda-date">Tanggal: ${formattedDate}</div>
+                        ${agenda.description ? `<div class="kalender-agenda-location">Lokasi: ${agenda.description}</div>` : ''}
+                        <div class="kalender-btn-gcal" onclick="addToGoogleCalendar('${agenda.title}', '${agenda.start}', '${agenda.end}')">Tambahkan ke Google Calendar</div>
+                    `;
+                    agendaContainer.appendChild(agendaEl);
+                });
+            }
+            window.showNotificationPopup = function (title, startDate, kegiatanId) {
+                let method = prompt("Pilih metode notifikasi:\n1. Email\n2. WhatsApp\nMasukkan nomor (1 atau 2):");
+                if (method === '1' || method === '2') {
+                    if (confirm(`Konfirmasi: Set notifikasi untuk "${title}" dengan ${method === '1' ? 'Email' : 'WhatsApp'}?`)) {
+                        saveNotification(kegiatanId, method === '1' ? 'email' : 'whatsapp');
+                    }
+                } else {
+                    alert("Pilihan tidak valid!");
+                }
+            };
+            async function saveNotification(kegiatanId, method) {
+                const response = await fetch('/api/save-notification/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        kegiatan_id: kegiatanId,
+                        metode: method
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Notifikasi berhasil disimpan!');
+                } else {
+                    alert('Gagal menyimpan notifikasi: ' + result.error);
+                }
+            };
+            window.filterAgenda = function () {
+                const q = document.getElementById('search').value.toLowerCase();
+                const start = calendar.view.activeStart;
+                const end = calendar.view.activeEnd;
+                fetch(`/api/events/?start=${start.toISOString()}&end=${end.toISOString()}`)
+                    .then(response => response.json())
+                    .then(eventsData => {
+                        const filtered = eventsData.filter(a => a.title.toLocaleLowerCase().includes(q));
+                        renderAgenda(filtered);
+                    });
+            };
+            window.addToGoogleCalendar = function (title, start, end) {
+                const startDate = new Date(start);
+                const endDate = end ? new Date(end) : new Date(startDate);
+                const formatDate = (date) => {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}${month}${day}`;
+                };
+                const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${formatDate(startDate)}/${formatDate(endDate)}`;
+                window.open(url, '_blank');
+            };
+            window.notify = function (title, date) {
+                alert(`Pengingat untuk agenda "${title}" pada tanggal ${date}`);
+            };
+            loadAgenda(calendar.view.activeStart, calendar.view.activeEnd);
+        });
+    </script>
+{% endblock %}

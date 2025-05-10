@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-jdcn$2)4aplnya62(z*28=g+3)uoejy6dpw8rjse34!5y08ak9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -86,7 +86,7 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'kalenderakademik',
+#         'NAME': 'kaldik',
 #         'USER':'root',
 #         'PASSWORD': '',
 #         'HOST':'localhost',
@@ -146,6 +146,7 @@ DATETIME_FORMAT = 'Y-m-d H:i'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR/'static']
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

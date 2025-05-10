@@ -1,48 +1,37 @@
+{% extends 'base.html' %}
 {% load static %}
-<html lang="id">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Login Kaldik UMS</title>
-    <link rel="stylesheet" href="{% static 'userAuth/css/styles.css' %}"/>
-    <link rel="icon" type="icon" href="{% static 'assets/LOGO_HD.png' %}"/>
+{% block title %}Login Kaldik UMS{% endblock %}
+{% block extra_head %}
     <style>
-        .bg {
-            background: url("{% static 'userAuth/assets/background.jpg' %}") no-repeat center center;
-            background-size: cover;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        body {
+            background: none; /* Override background dari base */
         }
     </style>
-</head>
-<body>
-<div class="bg">
-    <div class="login-container">
-        <div class="login-box">
-            <div class="left-logo">
-                <img src="{% static 'userAuth/assets/logo.png' %}" alt="Logo UMS"/>
-            </div>
-            <div class="right-form">
-                <h3>Selamat datang di <strong>KALDIK</strong></h3>
-                <p>Kalender Akademik<br>Universitas Muhammadiyah Surakarta</p>
-                {% if form.errors %}
-                <p style="color: red; font-size: 0.9rem;">Username/Email atau kata sandi salah.</p>
-                {% endif %}
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form.username }}
-                    {{ form.password }}
-                    <div class="button-group">
-                        <button type="submit" class="btn yellow">Login</button>
-                        <button type="button" class="btn blue">Login CAS</button>
-                    </div>
-                </form>
+{% endblock %}
+{% block content %}
+    <div class="auth-login">
+        <div class="auth-login-container">
+            <div class="auth-login-box">
+                <div class="auth-left-logo">
+                    <img src="{% static 'userAuth/assets/logo.png' %}" alt="Logo UMS"/>
+                </div>
+                <div class="auth-right-form">
+                    <h3>Selamat datang di <strong>KALDIK</strong></h3>
+                    <p>Kalender Akademik<br>Universitas Muhammadiyah Surakarta</p>
+                    {% if form.errors %}
+                        <p style="color: red; font-size: 0.9rem;">Username/Email atau kata sandi salah.</p>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.username }}
+                        {{ form.password }}
+                        <div class="button-group">
+                            <button type="submit" class="btn yellow">Login</button>
+                            <button type="button" class="btn blue">Login CAS</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-</body>
-</html>
+{% endblock %}

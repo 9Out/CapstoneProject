@@ -1,54 +1,134 @@
 {% load static %}
+
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} {% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css'%}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="icon" href="{% static 'assets/LOGO_HD.png' %}">
-     {% block extra_head %}
+    {% block extra_head %}
     {% endblock %}
 </head>
 <body>
-    <!-- navbar -->
+    <!-- Navbar -->
     <div class="navbar">
         <div class="logo-container">
             <a href="{% url 'home:home' %}">
-                <img src="{% static 'assets/logo.png'%}" alt="UMS Logo" class="logo">
+                <img src="{% static 'assets/logo.png' %}" alt="UMS Logo" class="logo">
                 <div class="university-text">
                     <span>UMS</span>
                     <span>Universitas Muhammadiyah Surakarta</span>
                 </div>
             </a>
         </div>
-        <div class="button-group">
-            <a href="{% url 'home:home' %}"><button>Beranda</button></a>
-            <a href="{% url 'kalender:kaldik' %}"><button>Kalender Akademik</button></a>
-            <a href="{% url 'about' %}"><button class="tentang">Tentang</button></a>
-            {% if user.is_authenticated %}
-            <form method="post" action="{% url 'userAuth:logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="user-btn"><img src="{% static 'assets/user.png'%}" alt="User Icon" class="user-icon"></button>
-            </form>
-            {% else %}
-            <a href="{% url 'userAuth:login'%}"><button class="user-btn"><img src="{% static 'assets/user.png'%}" alt="User Icon" class="user-icon"></button></a>
-            {% endif %}
+        <button class="hamburger" onclick="toggleMenu(event)">☰</button>
+        <div class="nav-right">
+            <ul class="nav-menu">
+                <li><a href="{% url 'home:home' %}" class="nav-link beranda">Beranda</a></li>
+                <li><a href="{% url 'kalender:kaldik' %}" class="nav-link">Kalender Akademik</a></li>
+                <li><a href="{% url 'about' %}" class="nav-link tentang">Tentang</a></li>
+                <li class="auth-link mobile-only">
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'userAuth:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link">Logout</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'userAuth:login' %}" class="nav-link">Login</a>
+                    {% endif %}
+                </li>
+            </ul>
+            <div class="user-menu desktop-only">
+                <button class="user-btn" onclick="toggleUserMenu(event)">
+                    <img src="{% static 'assets/user.png' %}" alt="User Icon" class="user-icon">
+                </button>
+                <ul class="user-dropdown">
+                    {% if user.is_authenticated %}
+                        <li>
+                            <form method="post" action="{% url 'userAuth:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="user-action">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'userAuth:login' %}" class="user-action">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
     <!-- endNavbar -->
 
-     <!-- content -->
-      {% block content %}
-      {% endblock %}
-     <!-- endContent -->
+    <!-- Content -->
+    {% block content %}
+    {% endblock %}
+    <!-- endContent -->
 
-    <!-- footer -->
-<!--    <div style="background-color: #1e3a8a; color: white; text-align: center; padding: 10px 0; position: relative; bottom: 0; width: 100%;">-->
-<!--        <p id="footer_child">&copy; 2025 Universitas Muhammadiyah Surakarta</p>-->
-<!--        &lt;!&ndash; <p id="footer_child">Hidoep Joke Ouch Why</p> &ndash;&gt;-->
-<!--    </div>-->
+    <!-- Footer -->
+    <div class="footer">
+        <p id="footer_child">© 2025 Universitas Muhammadiyah Surakarta</p>
+    </div>
     <!-- endFooter -->
 
+    <script>
+        function toggleMenu(event) {
+            const navMenu = document.querySelector('.navbar .nav-menu');
+            const userDropdown = document.querySelector('.navbar .user-dropdown');
+            navMenu.classList.toggle('show');
+            if (userDropdown) {
+                userDropdown.classList.remove('show'); // Tutup user dropdown jika menu utama dibuka
+            }
+            event.stopPropagation();
+        }
 
+        function toggleUserMenu(event) {
+            const userDropdown = document.querySelector('.navbar .user-dropdown');
+            const navMenu = document.querySelector('.navbar .nav-menu');
+            userDropdown.classList.toggle('show');
+            navMenu.classList.remove('show'); // Tutup menu utama jika user dropdown dibuka
+            event.stopPropagation();
+        }
+
+        // Tutup kedua menu saat klik di luar area
+        document.addEventListener('click', function(event) {
+            const navMenu = document.querySelector('.navbar .nav-menu');
+            const userDropdown = document.querySelector('.navbar .user-dropdown');
+            const hamburger = document.querySelector('.navbar .hamburger');
+            const userBtn = document.querySelector('.navbar .user-btn');
+
+            const isClickInsideNavMenu = navMenu.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+            const isClickInsideUserDropdown = userDropdown && userDropdown.contains(event.target);
+            const isClickOnUserBtn = userBtn && userBtn.contains(event.target);
+
+            if (!isClickInsideNavMenu && !isClickOnHamburger && navMenu.classList.contains('show')) {
+                navMenu.classList.remove('show');
+            }
+
+            if (userDropdown && !isClickInsideUserDropdown && !isClickOnUserBtn && userDropdown.classList.contains('show')) {
+                userDropdown.classList.remove('show');
+            }
+        });
+
+        // Tutup menu saat memilih item di menu utama
+        document.querySelectorAll('.navbar .nav-menu .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                const navMenu = document.querySelector('.navbar .nav-menu');
+                navMenu.classList.remove('show');
+            });
+        });
+
+        // Tutup user dropdown saat memilih item di user dropdown
+        const userActions = document.querySelectorAll('.navbar .user-dropdown .user-action');
+        if (userActions) {
+            userActions.forEach(action => {
+                action.addEventListener('click', function() {
+                    const userDropdown = document.querySelector('.navbar .user-dropdown');
+                    userDropdown.classList.remove('show');
+                });
+            });
+        }
+    </script>
 </body>
 </html>
