@@ -1,174 +1,114 @@
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f8f9fa;
-    color: #1e1e1e;
-  }
-  
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #1e3a8a;
-    padding: 5px 20px;
-    color: white;
-    border-bottom: 5px solid #f4c430;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background-color: #eef3fb;
+  color: #1e1e1e;
 }
 
-.logo-container {
-    display: flex;
-    align-items: center;
+/* Header */
+header {
+  background-color: #00205b;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid #ffcc00;
 }
 
-.logo-container a {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    align-items: center;
+.header-left h1 {
+  font-size: 1.3rem;
+  margin: 0;
 }
 
-.logo {
-    width: 80px;
-    margin-right: 10px;
+.header-right a {
+  color: white;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  font-weight: bold;
 }
 
-.university-text {
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-    display: flex;
-    flex-direction: column;
+.header-right a.active {
+  color: #ffcc00;
 }
 
-.university-text span:first-child {
-    font-size: 30px;
+/* Layout utama */
+.main-container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
 }
 
-.button-group {
-    display: flex;
-    align-items: center;
+/* Kalender */
+#calendar {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  width: 600px;
 }
 
-.button-group button {
-    background: none;
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    margin: 0 5px;
-    font-size: 20px;
-    cursor: pointer;
-    text-decoration: none;
+/* Agenda Kanan */
+.agenda-section {
+  width: 400px;
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
-.button-group button.kaldik {
-    color: #f4c430;
+.agenda-section h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
-.button-group .user-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    margin-left: 10px;
-    cursor: pointer;
+.agenda-section input {
+  width: 100%;
+  padding: 0.6rem;
+  margin: 1rem 0;
+  border: 2px solid #ccc;
+  border-radius: 6px;
 }
 
-.user-icon {
-    width: 35px;
-    height: 35px;
+.agenda-item {
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-left: 1rem;
+  border-left: 3px solid #00205b;
 }
-  
-  .main-container {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    flex-wrap: wrap;
-  }
-  
-  .calendar-section {
-    background: white;
-    padding: 20px;
-    flex: 1;
-    border-radius: 8px;
-    box-shadow: 0 0 4px rgba(0,0,0,0.1);
-  }
-  
-  .calendar-section h2 {
-    text-align: center;
-    color: #1e3a8a;
-  }
-  
-  .calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .nav-arrows button {
-    background-color: #1e3a8a;
-    color: white;
-    border: none;
-    margin-left: 5px;
-    cursor: pointer;
-    border-radius: 4px;
-    padding: 4px 8px;
-  }
-  
-  .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    margin-top: 10px;
-    gap: 5px;
-  }
-  
-  .day-name {
-    font-weight: bold;
-    text-align: center;
-    color: #1e3a8a;
-  }
-  
-  .day {
-    background: #e5edf7;
-    text-align: center;
-    padding: 10px;
-    border-radius: 4px;
-  }
-  
-  .day.red {
-    color: red;
-  }
-  
-  .day.inactive {
-    color: #ccc;
-  }
-  
-  .agenda-section {
-    background: white;
-    flex: 0.6;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 4px rgba(0,0,0,0.1);
-  }
-  
-  .search-box {
-    width: 100%;
-    padding: 6px 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .agenda-item {
-    border-top: 1px solid #ccc;
-    padding: 10px 0;
-    position: relative;
-  }
-  
-  .agenda-item .icon {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    background: #1e3a8a;
-    padding: 4px 6px;
-    border-radius: 4px;
-  }
-  
+
+.agenda-item-title {
+  font-weight: bold;
+  color: #00205b;
+}
+
+.agenda-date {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.agenda-location {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.btn-gcal {
+  background-color: #ffcc00;
+  border-radius: 20px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  display: inline-block;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+.btn-bell {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #ffcc00;
+  border-radius: 50%;
+  padding: 0.4rem;
+  cursor: pointer;
+}

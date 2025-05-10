@@ -2,75 +2,101 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kalender Akademik UMS</title>
   <link rel="stylesheet" href="style-kaldik.css" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 </head>
 <body>
-    <div class="navbar">
-        <div class="logo-container">
-            <a href="index.html">
-                <img src="logo.png" alt="UMS Logo" class="logo">
-                <div class="university-text">
-                    <span>UMS</span>
-                    <span>Universitas Muhammadiyah Surakarta</span>
-                </div>
-            </a>
-        </div>
-        <div class="button-group">
-            <button class="beranda">Beranda</button>
-            <button class="kaldik">Kalender Akademik</button>
-            <button class="tentang">Tentang</button>
-            <button class="user-btn"><img src="user.png" alt="User Icon" class="user-icon"></button>
-        </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <h1><strong>UMS</strong> Universitas Muhammadiyah Surakarta</h1>
     </div>
+    <div class="header-right">
+      <a href="#" class="active">Beranda</a>
+      <a href="#">Kalender Akademik</a>
+      <a href="#">Tentang</a>
+    </div>
+  </header>
 
-  <main class="main-container">
-    <section class="calendar-section">
-      <h2>KALENDER AKADEMIK 2024/2025</h2>
-      <div class="calendar-header">
-        <h3>Maret 2025</h3>
-        <div class="nav-arrows">
-          <button>&lt;</button>
-          <button>&gt;</button>
-        </div>
-      </div>
-      <div class="calendar-grid">
-        <div class="day-name">SU</div><div class="day-name">MO</div><div class="day-name">TU</div>
-        <div class="day-name">WE</div><div class="day-name">TH</div><div class="day-name">FR</div><div class="day-name">SA</div>
-        <!-- Days filled manually for demo -->
-        <div class="day inactive">23</div><div class="day inactive">24</div><div class="day inactive">25</div>
-        <div class="day inactive">26</div><div class="day inactive">27</div><div class="day inactive">28</div><div class="day">1</div>
-        <div class="day red">2</div><div class="day">3</div><div class="day">4</div><div class="day">5</div>
-        <div class="day">6</div><div class="day">7</div><div class="day">8</div>
-        <div class="day red">9</div><div class="day">10</div><div class="day">11</div><div class="day">12</div>
-        <div class="day">13</div><div class="day">14</div><div class="day">15</div>
-        <div class="day red">16</div><div class="day">17</div><div class="day">18</div><div class="day">19</div>
-        <div class="day">20</div><div class="day">21</div><div class="day">22</div>
-        <div class="day red">23</div><div class="day">24</div><div class="day">25</div><div class="day">26</div>
-        <div class="day">27</div><div class="day">28</div><div class="day">29</div>
-        <div class="day red">30</div><div class="day">31</div><div class="day inactive">1</div>
-        <div class="day inactive">2</div><div class="day inactive">3</div><div class="day inactive">4</div><div class="day inactive">5</div>
-      </div>
-    </section>
+  <!-- Main content -->
+  <div class="main-container">
+    <div id="calendar"></div>
 
-    <section class="agenda-section">
-      <h3>Agenda Akademik</h3>
-      <input type="text" placeholder="cari agenda..." class="search-box" />
-      <div class="agenda-item">
-        <h4>Revisi KRS</h4>
-        <p>Tanggal: 3 - 9 Maret 2025</p>
-        <p>Lokasi: Gedung Siti Walidah</p>
-        <span class="icon">🔔</span>
-      </div>
-      <div class="agenda-item">
-        <h4>Hari Kerja Efektif</h4>
-        <p>Tanggal: 10 Maret 2025</p>
-        <span class="icon">🔔</span>
-      </div>
-    </section>
-  </main>
+    <div class="agenda-section">
+      <h2>Agenda Akademik</h2>
+      <input type="text" id="search" placeholder="cari agenda..." onkeyup="filterAgenda()">
+      <div id="agenda-container"></div>
+    </div>
+  </div>
 
-  <script src="scripts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+      const agendaContainer = document.getElementById('agenda-container');
+
+      const eventsData = [
+        {
+          title: 'Revisi KRS',
+          start: '2025-03-03',
+          end: '2025-03-09',
+          description: 'Gedung Siti Walidah',
+        },
+        {
+          title: 'Hari Kerja Efektif',
+          start: '2025-03-10',
+          description: '',
+        }
+      ];
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        initialDate: '2025-03-01',
+        locale: 'id',
+        events: eventsData,
+      });
+
+      calendar.render();
+
+      function renderAgenda(agendaList) {
+        agendaContainer.innerHTML = agendaList.map(agenda => `
+          <div class="agenda-item">
+            <div class="btn-bell" onclick="notify('${agenda.title}', '${agenda.start}')">🔔</div>
+            <div class="agenda-item-title">${agenda.title}</div>
+            <div class="agenda-date">Tanggal: ${agenda.start}</div>
+            ${agenda.description ? `<div class="agenda-location">Lokasi: ${agenda.description}</div>` : ''}
+            <div class="btn-gcal" onclick="addToGoogleCalendar('${agenda.title}', '${agenda.start}')">Tambahkan ke Google Calendar</div>
+          </div>
+        `).join('');
+      }
+
+      const agendaData = eventsData.map(e => ({
+        title: e.title,
+        start: e.start,
+        description: e.description
+      }));
+
+      renderAgenda(agendaData);
+
+      window.filterAgenda = function () {
+        const q = document.getElementById('search').value.toLowerCase();
+        const filtered = agendaData.filter(a => a.title.toLowerCase().includes(q));
+        renderAgenda(filtered);
+      };
+
+      window.addToGoogleCalendar = function (title, date) {
+        const cleanDate = date.replace(/-/g, '');
+        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${cleanDate}/${cleanDate}`;
+        window.open(url, '_blank');
+      };
+
+      window.notify = function (title, date) {
+        alert(`Pengingat untuk agenda "${title}" pada tanggal ${date}`);
+      };
+    });
+  </script>
+
 </body>
 </html>
