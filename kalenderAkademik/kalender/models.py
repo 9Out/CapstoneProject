@@ -1,15 +1,20 @@
 from django.conf import settings
 from django.db import models
 
-# from django.contrib.auth.models import User
-# Create your models here.
+
+class TahunAkademik(models.Model):
+    tahun_akademik = models.CharField(max_length=10)
+    def _str_(self):
+        return self.tahun_akademik
 
 class Kategori(models.Model):
     nama = models.CharField(max_length=25)
-    def __str__(self):
+    def _str_(self):
         return self.nama
 
 class Kegiatan(models.Model):
+    tahun_akademik = models.ForeignKey(TahunAkademik, on_delete=models.CASCADE)
+    semester = models.CharField(choices=[('ganjil','Ganjil'),('genap','Genap')], max_length=20, default='ganjil')
     nama = models.CharField(max_length=50)
     deskripsi = models.CharField(max_length=254, blank=True, null=True)
     tgl_mulai = models.DateTimeField()
@@ -18,7 +23,7 @@ class Kegiatan(models.Model):
     kategori_fk = models.ForeignKey(Kategori, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def _str_(self):
         return self.nama
 
 class Notifikasi(models.Model):

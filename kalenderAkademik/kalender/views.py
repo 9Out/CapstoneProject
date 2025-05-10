@@ -9,6 +9,5 @@ class KegiatanViewSet(viewsets.ModelViewSet):
     queryset = Kegiatan.objects.all()
     serializer_class = KegiatanSerializer
 
-# Create your views here.
 def kalender(request):
     return render(request, 'kalender/kaldik.html')
