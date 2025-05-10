@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengingat Kegiatan Akademik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #222;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Container Utama */
+        .email-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        .email-container {
+            background-color: #222;
+            overflow: hidden;
+        }
+        
+        /* Header Email */
+        .email-header {
+            background: linear-gradient(135deg, #54a0ff 0%, #00d2ff 100%);
+            padding: 24px 20px;
+            text-align: center;
+        }
+        
+        .email-header h2 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .email-header p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 6px;
+            font-size: 16px;
+        }
+        
+        /* Konten Email */
+        .email-content {
+            padding: 24px 16px;
+            color: #fff;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+        
+        .message {
+            margin-bottom: 28px;
+            font-size: 16px;
+            color: #ccc;
+            line-height: 1.7;
+        }
+        
+        /* Detail Kegiatan */
+        .event-card {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #3a3a3a;
+        }
+        
+        .event-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .detail-table tr {
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .detail-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            padding: 12px 0;
+            width: 40%;
+            text-align: left;
+            color: #999;
+            font-size: 16px;
+            vertical-align: top;
+        }
+        
+        .detail-value {
+            padding: 12px 0;
+            width: 60%;
+            text-align: right;
+            color: #fff;
+            font-weight: 500;
+            font-size: 16px;
+            vertical-align: top;
+        }
+        
+        /* Footer Email */
+        .email-footer {
+            background-color: #2a2a2a;
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            border-top: 1px solid #3a3a3a;
+        }
+        
+        /* Media Queries untuk Mobile */
+        @media only screen and (max-width: 600px) {
+            .email-header {
+                padding: 20px 16px;
+            }
+            
+            .email-content {
+                padding: 20px 16px;
+            }
+            
+            .detail-label, .detail-value {
+                font-size: 15px;
+                padding: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <div class="email-header">
+                <h2>Pengingat Kegiatan Akademik</h2>
+                <p>Informasi penting untuk diperhatikan</p>
+            </div>
+            
+            <div class="email-content">
+                <div class="greeting">Halo {{ nama }},</div>
+                
+                <div class="message">{{ pesan }}</div>
+                
+                <div class="event-card">
+                    <div class="event-title">Detail Kegiatan</div>
+                    
+                    <table class="detail-table">
+                        <tr>
+                            <td class="detail-label">Kegiatan</td>
+                            <td class="detail-value">{{ kegiatan }}</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-label">Tanggal Mulai</td>
+                            <td class="detail-value">{{ tgl_mulai }}</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-label">Tanggal Selesai</td>
+                            <td class="detail-value">{{ tgl_selesai }}</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-label">Semester</td>
+                            <td class="detail-value">{{ semester }}</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-label">Tahun Akademik</td>
+                            <td class="detail-value">{{ tahun_ajaran }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="email-footer">
+                <p>Pesan ini dikirim secara otomatis. Harap jangan membalas email ini.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

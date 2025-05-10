@@ -77,26 +77,26 @@ WSGI_APPLICATION = 'kalenderAkademik.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'kalenderakademik',
-        'USER':'root',
-        'PASSWORD': '',
-        'HOST':'localhost',
-        'PORT':'',
-        'OPTIONS':{
-            'charset':'utf8mb4'
-        }
-        
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'kalenderakademik',
+#         'USER':'root',
+#         'PASSWORD': '',
+#         'HOST':'localhost',
+#         'PORT':'',
+#         'OPTIONS':{
+#             'charset':'utf8mb4'
+#         }
+        
+#     }
+# }
 
 
 # Password validation
@@ -162,3 +162,20 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'kalenderakademikums.project@gmail.com'  
 EMAIL_HOST_PASSWORD = 'vooi mima vxav znkt' 
 DEFAULT_FROM_EMAIL = 'kalenderakademikums.project@gmail.com'
+
+
+# CELERY CONF
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+
+# Celery Beat
+CELERY_BEAT_SCHEDULE = {
+    'check-notifications-every-minute': {
+        'task': 'kalender.tasks.check_notifications',
+        'schedule': 30.0,  
+    },
+}

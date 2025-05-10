@@ -16,9 +16,9 @@ class Kategori(models.Model):
 
 class Kegiatan(models.Model):
     tahun_akademik = models.ForeignKey(TahunAkademik, on_delete=models.CASCADE)
-    semester = models.CharField(choices=[('ganjil','Ganjil'),('genap','Genap')], max_length=20, default='ganjil')
+    semester = models.CharField(choices=[('Ganjil','Ganjil'),('Genap','Genap')], max_length=20, default='Ganjil')
     nama = models.CharField(max_length=50)
-    deskripsi = models.CharField(max_length=254, blank=True, null=True)
+    deskripsi = models.TextField(max_length=254, blank=True, null=True)
     tgl_mulai = models.DateTimeField()
     tgl_selesai = models.DateTimeField()
     user_fk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -31,10 +31,11 @@ class Kegiatan(models.Model):
 class Notifikasi(models.Model):
     user_fk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     kegiatan_fk = models.ForeignKey(Kegiatan, on_delete=models.CASCADE)
-    pesan = models.CharField(max_length=254, blank=True, null=True)
     metode = models.CharField(choices=[('email','Email'),('whatsapp','Whatsapp')], max_length=20, default='email')
-    status = models.CharField(choices=[('pending','Pending'),('terkirim','Terkirim'),('gagal','Gagal')], max_length=20, default='pending')
+    status = models.CharField(choices=[('Pending','Pending'),('Terkirim','Terkirim'),('Gagal','Gagal')], max_length=20, default='Pending')
+    one_day_before = models.BooleanField(default=False)
+    one_hour_before = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Notifikasi untuk {self.user_fk}: {self.pesan}"
+        return f"Notifikasi untuk {self.user_fk}"
