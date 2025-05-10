@@ -23,6 +23,6 @@ urlpatterns = [
     path('kalender/', include('kalender.urls')),
     path('about/', include('aboutUs.urls')),
     path('auth/', include('userAuth.urls')),
-    path('api/', include('kalender.urls')),
+    path('api/', include('kalender.api_urls')),
 ]
 
