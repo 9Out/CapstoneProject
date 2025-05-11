@@ -1,0 +1,863 @@
+/* Reset dan pengaturan global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Base layout untuk semua halaman kecuali login */
+body:not(.auth-login) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #eef3fb;
+}
+
+/* Navbar (dari base.html) */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e3a8a;
+    padding: 10px 20px;
+    color: white;
+    border-bottom: 5px solid #f4c430;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1000;
+}
+
+.navbar .logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.navbar .logo-container a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
+
+.navbar .logo {
+    width: 60px;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+.navbar .logo-container a:hover .logo {
+    transform: scale(1.1);
+}
+
+.navbar .university-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    transition: color 0.3s ease;
+}
+
+.navbar .university-text span:first-child {
+    font-size: 24px;
+}
+
+.navbar .university-text:hover {
+    color: #f4c430;
+}
+
+.navbar .hamburger {
+    display: none; 
+    background: none;
+    border: none;
+    color: #f4c430;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar .hamburger:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.navbar .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 5px; 
+}
+
+.navbar .nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+}
+
+.navbar .nav-menu li {
+    margin: 0;
+}
+
+.navbar .nav-menu .nav-link {
+    color: white;
+    padding: 8px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-weight: 500;
+}
+
+.navbar .nav-menu .nav-link:hover {
+    background-color: #f4c430;
+    color: #1e3a8a;
+}
+
+.navbar .nav-menu .nav-link.beranda {
+    color: #f4c430;
+}
+
+.navbar .nav-menu .nav-link.beranda:hover {
+    background-color: #1e3a8a;
+    color: #f4c430;
+}
+
+.navbar .user-menu {
+    position: relative;
+}
+
+.navbar .user-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.navbar .user-btn:hover {
+    transform: scale(1.1);
+}
+
+.navbar .user-icon {
+    width: 30px;
+    height: 30px;
+    transition: transform 0.3s ease;
+}
+
+.navbar .user-btn:hover .user-icon {
+    transform: scale(1.1);
+}
+
+.navbar .user-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #1e3a8a;
+    border: 1px solid #f4c430;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    list-style: none;
+    padding: 10px 0;
+    margin: 5px 0 0 0;
+    width: 120px;
+    z-index: 1001;
+}
+
+.navbar .user-dropdown.show {
+    display: block;
+}
+
+.navbar .user-dropdown li {
+    margin: 0;
+}
+
+.navbar .user-dropdown .user-action {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: right;
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar .user-dropdown .user-action:last-child {
+    border-bottom: none;
+}
+
+.navbar .user-dropdown .user-action:hover {
+    background-color: #f4c430;
+    color: #1e3a8a;
+}
+
+/* Footer */
+.footer {
+    background-color: #1e3a8a;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.footer #footer_child {
+    font-size: 16px;
+}
+
+/* Home App (index.html) */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.home-header {
+    background-size: cover;
+    background-position: center;
+    height: 300px; /* Tinggi header */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.home-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Overlay gelap untuk kontras teks */
+    z-index: 1;
+}
+
+.home-header .home-judul {
+    position: relative;
+    z-index: 2; /* Pastikan teks di atas overlay */
+    margin: 0;
+}
+
+.home-judul h1 {
+    font-size: 36px;
+    color: white; /* Ubah warna teks agar kontras dengan overlay */
+    margin-bottom: 8px;
+}
+
+.home-judul p {
+    font-size: 20px;
+    color: white; /* Ubah warna teks agar kontras dengan overlay */
+    margin-bottom: 15px;
+}
+
+.home-main {
+    background-color: white;
+    margin: 15px;
+    padding: 20px;
+    text-align: center;
+    min-height: 400px;
+    flex: 1; /* Pastikan konten utama mengisi ruang yang tersisa */
+}
+
+.home-section {
+    margin-bottom: 15px;
+    text-align: left;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.home-section.announcement {
+    background-color: #fff9c4;
+}
+
+.home-section.events {
+    background-color: #dcedc8;
+}
+
+.home-section ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.home-section li {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* AboutUs App (about.html) */
+.about-content {
+    margin: 15px auto;
+    padding: 15px 30px;
+}
+
+.about-content h1 {
+    font-size: 28px;
+    color: #1e3a8a;
+    margin-bottom: 8px;
+}
+
+.about-content p {
+    color: #2F318B;
+    font-size: 16px;
+    font-style: normal;
+}
+
+.about-content ul {
+    list-style-type: none;
+    padding: 5px;
+}
+
+.about-content ul li {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.about-content ul li::before {
+    content: "•";
+    color: #1e3a8a;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+.about-content .contact {
+    font-size: 14px;
+}
+
+.about-content .contact a {
+    color: #1e3a8a;
+    text-decoration: none;
+}
+
+.about-content .contact a:hover {
+    text-decoration: underline;
+}
+
+/* Kalender App (kalenderAkademik.html) */
+.kalender-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+.kalender-main-container {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.kalender-calendar-container {
+    flex: 2;
+    min-width: 300px;
+}
+
+.kalender-calendar-container #calendar {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.kalender-agenda-section {
+    flex: 1;
+    min-width: 300px;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.kalender-agenda-section h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+}
+
+.kalender-agenda-section input {
+    width: 100%;
+    padding: 0.6rem;
+    margin: 0 0 1rem 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.kalender-agenda-item {
+    margin-bottom: 1rem;
+    position: relative;
+    padding-left: 1.2rem;
+    border-left: 4px solid #00205b;
+}
+
+.kalender-agenda-item-title {
+    font-weight: bold;
+    color: #00205b;
+    padding-right: 35px;
+    font-size: 1rem;
+}
+
+.kalender-agenda-date {
+    margin: 0.2rem 0;
+    font-size: 0.85rem;
+}
+
+.kalender-agenda-location {
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.kalender-btn-gcal {
+    background-color: #ffcc00;
+    color: #00205b;
+    border: none;
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 0.6rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.kalender-btn-gcal:hover {
+    background-color: #e6b800;
+}
+
+.kalender-btn-bell {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.kalender-btn-bell:hover {
+    background-color: #e6b800;
+}
+
+/* UserAuth App (login.html) */
+.auth-login {
+    background: url('../userAuth/assets/background.jpg') no-repeat center center;
+    background-size: cover;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.auth-login-box {
+    display: flex;
+    width: 750px;
+    max-width: 90%;
+    gap: 50px;
+}
+
+.auth-left-logo img {
+    align-items: top;
+    width: 20vh;
+}
+
+.auth-right-form {
+    border-radius: 20px;
+    padding: 20px 30px;
+    height: 45vh;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-right-form h3 {
+    font-size: 24px;
+    font-weight: normal;
+    margin-bottom: 5px;
+    color: #003893;
+}
+
+.auth-right-form strong {
+    color: #003893;
+}
+
+.auth-right-form p {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #003893;
+}
+
+.auth-right-form form input {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.auth-right-form .button-group {
+    display: flex;
+    justify-content: right;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.auth-right-form .btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.auth-right-form .btn.yellow {
+    background-color: #ffe600;
+    color: black;
+}
+
+.auth-right-form .btn.blue {
+    background-color: #2a2a9e;
+    color: white;
+}
+
+/* Responsif untuk Navbar */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 10px 15px;
+    }
+
+    .navbar .logo-container {
+        width: auto;
+    }
+
+    .navbar .hamburger {
+        display: block;
+        order: 2; /* Menempatkan hamburger di kanan */
+    }
+
+    .navbar .nav-right {
+        position: static; /* Pastikan posisi untuk nav-menu absolut */
+    }
+
+    .navbar .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 15px;
+        background-color: #1e3a8a;
+        border: 1px solid #f4c430;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        flex-direction: column;
+        width: 200px;
+        padding: 10px 0;
+        margin-top: 5px;
+        z-index: 1001; /* Pastikan di atas elemen lain */
+    }
+
+    .navbar .nav-menu.show {
+        display: flex; /* Tampilkan saat kelas .show ditambahkan */
+    }
+
+    .navbar .nav-menu .nav-link {
+        padding: 10px 20px;
+        font-size: 16px;
+        text-align: right;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .navbar .nav-menu .nav-link:last-child {
+        border-bottom: none;
+    }
+
+    .navbar .user-menu {
+        display: none; /* Sembunyikan user menu di ponsel */
+    }
+
+    .navbar .auth-link.mobile-only {
+        display: block; /* Tampilkan opsi Login/Logout di menu utama */
+    }
+
+    .navbar .university-text {
+        font-size: 14px;
+    }
+
+    .navbar .university-text span:first-child {
+        font-size: 20px;
+    }
+
+    .navbar .logo {
+        width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 8px 10px;
+    }
+
+    .navbar .university-text {
+        font-size: 12px;
+    }
+
+    .navbar .university-text span:first-child {
+        font-size: 18px;
+    }
+
+    .navbar .logo {
+        width: 40px;
+    }
+
+    .navbar .nav-menu {
+        width: 180px;
+        right: 10px;
+    }
+
+    .navbar .nav-menu .nav-link {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+}
+
+/* Responsif untuk Home */
+@media (max-width: 768px) {
+    .home-header {
+        height: 250px; /* Kurangi tinggi header di ponsel */
+    }
+
+    .home-judul h1 {
+        font-size: 28px;
+    }
+
+    .home-judul p {
+        font-size: 16px;
+    }
+
+    .home-main {
+        margin: 10px;
+        padding: 15px;
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-header {
+        height: 200px; /* Kurangi lagi tinggi header di layar kecil */
+    }
+
+    .home-judul h1 {
+        font-size: 24px;
+    }
+
+    .home-judul p {
+        font-size: 14px;
+    }
+
+    .home-main {
+        margin: 8px;
+        padding: 10px;
+    }
+}
+
+/* Responsif untuk About */
+@media (max-width: 768px) {
+    .about-content {
+        padding: 10px 20px;
+    }
+
+    .about-content h1 {
+        font-size: 24px;
+    }
+
+    .about-content p,
+    .about-content ul li {
+        font-size: 14px;
+    }
+}
+
+/* Responsif untuk Kalender */
+@media (max-width: 992px) {
+    .kalender-main-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .kalender-calendar-container,
+    .kalender-agenda-section {
+        width: 100%;
+        max-width: 700px;
+        flex: none;
+    }
+
+    .kalender-calendar-container {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .kalender-container {
+        padding: 1rem 0.8rem;
+    }
+
+    .kalender-agenda-section {
+        padding: 0.8rem;
+    }
+
+    .kalender-agenda-item-title {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .kalender-container {
+        padding: 0.8rem 0.5rem;
+    }
+
+    .kalender-agenda-section input {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .kalender-btn-gcal {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .kalender-fc-header-toolbar {
+        display: flex;
+        flex-direction: column !important;
+        gap: 0.4rem !important;
+        align-items: center !important;
+    }
+
+    .kalender-fc-header-toolbar .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 0.4rem;
+        gap: 0.4rem;
+    }
+
+    .kalender-fc-button-group {
+        display: flex !important;
+        gap: 0.2rem;
+    }
+
+    .kalender-fc-button {
+        padding: 0.3em 0.4em !important;
+        font-size: 0.8em !important;
+    }
+
+    .kalender-fc-toolbar-title {
+        font-size: 1em !important;
+        margin: 0.1em 0 !important;
+    }
+}
+
+/* Responsif untuk Login */
+@media (max-width: 768px) {
+    .auth-login-box {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .auth-left-logo img {
+        width: 15vh;
+    }
+
+    .auth-right-form {
+        padding: 15px 20px;
+        height: auto;
+        min-height: 40vh;
+    }
+
+    .auth-right-form h3 {
+        font-size: 20px;
+    }
+
+    .auth-right-form p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-right-form {
+        padding: 10px 15px;
+    }
+
+    .auth-right-form h3 {
+        font-size: 18px;
+    }
+
+    .auth-right-form p {
+        font-size: 12px;
+    }
+
+    .auth-right-form .btn {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
+
+/* Utility Classes */
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+
+    .mobile-only {
+        display: block;
+    }
+}

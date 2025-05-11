@@ -11,6 +11,7 @@
     {% endblock %}
 </head>
 <body>
+    {% if request.path != '/auth/login/' %}
     <!-- Navbar -->
     <div class="navbar">
         <div class="logo-container">
@@ -59,17 +60,20 @@
         </div>
     </div>
     <!-- endNavbar -->
+    {% endif %}
 
     <!-- Content -->
     {% block content %}
     {% endblock %}
     <!-- endContent -->
 
+    {% if request.path != '/auth/login/' %}
     <!-- Footer -->
     <div class="footer">
         <p id="footer_child">© 2025 Universitas Muhammadiyah Surakarta</p>
     </div>
     <!-- endFooter -->
+    {% endif %}
 
     <script>
         function toggleMenu(event) {
@@ -77,7 +81,7 @@
             const userDropdown = document.querySelector('.navbar .user-dropdown');
             navMenu.classList.toggle('show');
             if (userDropdown) {
-                userDropdown.classList.remove('show'); // Tutup user dropdown jika menu utama dibuka
+                userDropdown.classList.remove('show'); 
             }
             event.stopPropagation();
         }
@@ -86,7 +90,7 @@
             const userDropdown = document.querySelector('.navbar .user-dropdown');
             const navMenu = document.querySelector('.navbar .nav-menu');
             userDropdown.classList.toggle('show');
-            navMenu.classList.remove('show'); // Tutup menu utama jika user dropdown dibuka
+            navMenu.classList.remove('show'); 
             event.stopPropagation();
         }
 

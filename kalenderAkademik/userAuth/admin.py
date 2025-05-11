@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import CustomUser
 from django.contrib.auth.admin import UserAdmin
+from .forms import CustomUserAddForm
 
 # Register your models here.
 
@@ -10,11 +11,24 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ['is_staff', 'is_superuser', 'peran']
     search_fields = ['username', 'email']
     ordering = ('username',)
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('peran', 'no_telpon')}),
+    
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'peran', 'no_telpon')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {'fields': ('email', 'peran', 'no_telpon')}),
+    
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'first_name', 'last_name', 'email', 'peran', 'no_telpon', 'password1', 'password2'),
+        }),
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser'),
+        }),
     )
+    
+    add_form = CustomUserAddForm
 
 admin.site.register(CustomUser, CustomUserAdmin)

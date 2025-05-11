@@ -126,6 +126,12 @@ class Kegiatan(models.Model):
     user_fk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     kategori_fk = models.ForeignKey(Kategori, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    # updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        permissions = [
+            ("can_add_kalender_entry", "Can add kalender entries"),
+        ]
 
     def __str__(self):
         return self.nama

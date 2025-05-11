@@ -249,25 +249,25 @@ body:not(.auth-login) {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Overlay gelap untuk kontras teks */
+    background: rgba(0, 0, 0, 0.5); 
     z-index: 1;
 }
 
 .home-header .home-judul {
     position: relative;
-    z-index: 2; /* Pastikan teks di atas overlay */
+    z-index: 2; 
     margin: 0;
 }
 
 .home-judul h1 {
     font-size: 36px;
-    color: white; /* Ubah warna teks agar kontras dengan overlay */
+    color: white; 
     margin-bottom: 8px;
 }
 
 .home-judul p {
     font-size: 20px;
-    color: white; /* Ubah warna teks agar kontras dengan overlay */
+    color: white; 
     margin-bottom: 15px;
 }
 
@@ -277,7 +277,7 @@ body:not(.auth-login) {
     padding: 20px;
     text-align: center;
     min-height: 400px;
-    flex: 1; /* Pastikan konten utama mengisi ruang yang tersisa */
+    flex: 1; 
 }
 
 .home-section {
@@ -575,11 +575,11 @@ body:not(.auth-login) {
 
     .navbar .hamburger {
         display: block;
-        order: 2; /* Menempatkan hamburger di kanan */
+        order: 2; 
     }
 
     .navbar .nav-right {
-        position: static; /* Pastikan posisi untuk nav-menu absolut */
+        position: static; 
     }
 
     .navbar .nav-menu {
@@ -595,11 +595,11 @@ body:not(.auth-login) {
         width: 200px;
         padding: 10px 0;
         margin-top: 5px;
-        z-index: 1001; /* Pastikan di atas elemen lain */
+        z-index: 1001; 
     }
 
     .navbar .nav-menu.show {
-        display: flex; /* Tampilkan saat kelas .show ditambahkan */
+        display: flex; 
     }
 
     .navbar .nav-menu .nav-link {
@@ -608,17 +608,23 @@ body:not(.auth-login) {
         text-align: right;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
+    .navbar .auth-link.mobile-only button {
+        background-color: #1e3a8a;
+        width: 100%;
+        text-align: right;
+        margin-top: 10px;
+    }
 
     .navbar .nav-menu .nav-link:last-child {
         border-bottom: none;
     }
 
     .navbar .user-menu {
-        display: none; /* Sembunyikan user menu di ponsel */
+        display: none; 
     }
 
     .navbar .auth-link.mobile-only {
-        display: block; /* Tampilkan opsi Login/Logout di menu utama */
+        display: block;
     }
 
     .navbar .university-text {
@@ -665,7 +671,7 @@ body:not(.auth-login) {
 /* Responsif untuk Home */
 @media (max-width: 768px) {
     .home-header {
-        height: 250px; /* Kurangi tinggi header di ponsel */
+        height: 250px;
     }
 
     .home-judul h1 {
@@ -685,7 +691,7 @@ body:not(.auth-login) {
 
 @media (max-width: 480px) {
     .home-header {
-        height: 200px; /* Kurangi lagi tinggi header di layar kecil */
+        height: 200px; 
     }
 
     .home-judul h1 {

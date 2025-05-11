@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +44,47 @@ INSTALLED_APPS = [
     'userAuth',
     'rest_framework',
 ]
+
+
+JAZZMIN_SETTINGS = {
+    "changeform_format": "default", 
+    "show_ui_builder": True,  
+    "site_logo": "assets/LOGO_HD.png",
+    "site_title": "Administrator Kalender Akademik",
+    "site_header": "Kalender Akademik",
+    "icons": {
+        "auth": "fas fa-users-cog",           
+        "kalender": "fas fa-calendar-alt",    
+        "userauth": "fas fa-user",            
+        "auth.group": "fas fa-users",         
+        "kalender.kategori": "fas fa-tags",   
+        "kalender.kegiatan": "fas fa-tasks",  
+        "kalender.notifikasi": "fas fa-bell", 
+        "kalender.tahunakademik": "fas fa-graduation-cap",  
+        "userauth.customuser": "fas fa-user-circle",        
+    },
+}
+
+# JAZZMIN_SETTINGS = {
+#     # Judul situs di panel admin
+#     "site_title": "My Admin",
+#     # Logo situs
+#     "site_logo": "images/logo.png",
+#     # Tema (pilih dari bootswatch, misalnya 'cyborg', 'flatly', dll.)
+#     "theme": "cyborg",
+#     # Kustomisasi menu samping
+#     "navigation_expanded": True,
+#     # CSS kustom
+#     "custom_css": "css/custom.css",
+#     # JS kustom
+#     "custom_js": "js/custom.js",
+#     # Menyembunyikan aplikasi tertentu
+#     "hide_apps": ['auth'],
+#     # Menyembunyikan model tertentu
+#     "hide_models": ['auth.user'],
+#     # Mengaktifkan UI tweaker
+#     "show_ui_builder": True,
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
