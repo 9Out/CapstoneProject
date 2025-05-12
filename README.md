@@ -10,7 +10,7 @@
 ## Langkah-langkah Instalasi dan Pengaturan
 
 ### 1. Buka Proyek
-- Buka proyek ini menggunakan code editor favoritmu (misalnya VSCode).
+- Buka proyek ini menggunakan code editor misalnya VSCode.
 - Pastikan kamu berada di direktori root proyek (`KalenderAkademik-capstone`).
 
 ### 2. Siapkan Lingkungan Virtual
@@ -34,6 +34,7 @@
   pip install requests
   pip install celery[redis]
   pip install mysqlclient  # Opsional, jika menggunakan MySQL
+  pip install django-jazzmin # Style custom panel admin
   ```
 
 ### 4. Instal Redis dan Node.js
