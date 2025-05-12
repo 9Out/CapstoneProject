@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kalender Akademik UMS</title>
+  <link rel="stylesheet" href="dosen-kaldik.css" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <h1><strong>UMS</strong> Universitas Muhammadiyah Surakarta</h1>
+    </div>
+    <div class="header-right">
+      <a href="#" class="active">Beranda</a>
+      <a href="#">Kalender Akademik</a>
+      <a href="#">Tentang</a>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <div class="main-container">
+    <div id="calendar"></div>
+
+    <div class="agenda-section">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Agenda Akademik</h2>
+        <button onclick="openModal()" style="background-color: #00205b; color: white; border: none; padding: 6px 12px; border-radius: 6px;">Tambah</button>
+      </div>
+
+      <input type="text" id="search" placeholder="cari agenda..." onkeyup="filterAgenda()">
+      <div id="agenda-container"></div>
+
+      <!-- Modal -->
+      <div id="eventModal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn" onclick="closeModal()">&times;</span>
+          <h3 style="color:#1d267d; font-size: 20px;">Add Event</h3>
+
+          <label for="eventTitle">Event</label>
+          <input type="text" id="eventTitle" placeholder="Your Event" />
+
+          <div style="display: flex; gap: 50px;">
+            <div style="flex: 1;">
+              <label for="eventStart">Start Date</label>
+              <input type="date" id="eventStart" />
+            </div>
+            <div style="flex: 1;">
+              <label for="eventEnd">End Date</label>
+              <input type="date" id="eventEnd" />
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 50px; margin-top: 10px;">
+            <div style="flex: 1;">
+              <label for="eventDays">Days</label>
+              <input type="text" id="eventDays" readonly />
+            </div>
+            <div style="flex: 1;">
+              <label for="eventColor">Color</label>
+              <select id="eventColor">
+                <option value="#e74c3c" style="color:#e74c3c;">Merah</option>
+                <option value="#3498db" style="color:#3498db;">Biru</option>
+                <option value="#2ecc71" style="color:#2ecc71;">Hijau</option>
+                <option value="#f1c40f" style="color:#f1c40f;">Kuning</option>
+                <option value="#9b59b6" style="color:#9b59b6;">Ungu</option>
+              </select>
+            </div>
+          </div>
+
+          <button onclick="addEvent()" style="margin-top: 1rem; width: 100%; background-color: #1d267d; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold;">
+            Add Event
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+      const agendaContainer = document.getElementById('agenda-container');
+
+      const eventsData = [
+        {
+          title: 'Revisi KRS',
+          start: '2025-03-03',
+          end: '2025-03-09',
+          description: 'Gedung Siti Walidah',
+        },
+        {
+          title: 'Hari Kerja Efektif',
+          start: '2025-03-10',
+          description: '',
+        }
+      ];
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        initialDate: '2025-03-01',
+        locale: 'id',
+        events: eventsData,
+      });
+
+      calendar.render();
+
+      function renderAgenda(agendaList) {
+        agendaContainer.innerHTML = agendaList.map(agenda => `
+          <div class="agenda-item">
+            <div class="btn-bell" onclick="notify('${agenda.title}', '${agenda.start}')">🔔</div>
+            <div class="agenda-item-title">${agenda.title}</div>
+            <div class="agenda-date">Tanggal: ${agenda.start}</div>
+            ${agenda.description ? `<div class="agenda-location">Lokasi: ${agenda.description}</div>` : ''}
+            <div class="btn-gcal" onclick="addToGoogleCalendar('${agenda.title}', '${agenda.start}')">Tambahkan ke Google Calendar</div>
+          </div>
+        `).join('');
+      }
+
+      const agendaData = eventsData.map(e => ({
+        title: e.title,
+        start: e.start,
+        description: e.description
+      }));
+
+      renderAgenda(agendaData);
+
+      window.filterAgenda = function () {
+        const q = document.getElementById('search').value.toLowerCase();
+        const filtered = agendaData.filter(a => a.title.toLowerCase().includes(q));
+        renderAgenda(filtered);
+      };
+
+      window.addToGoogleCalendar = function (title, date) {
+        const cleanDate = date.replace(/-/g, '');
+        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${cleanDate}/${cleanDate}`;
+        window.open(url, '_blank');
+      };
+
+      window.notify = function (title, date) {
+        alert(`Pengingat untuk agenda "${title}" pada tanggal ${date}`);
+      };
+
+      const modal = document.getElementById('eventModal');
+      document.getElementById('eventStart').addEventListener('change', calculateDays);
+      document.getElementById('eventEnd').addEventListener('change', calculateDays);
+
+      function calculateDays() {
+        const start = new Date(document.getElementById('eventStart').value);
+        const end = new Date(document.getElementById('eventEnd').value);
+          if (!isNaN(start) && !isNaN(end)) {
+            const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById('eventDays').value = diff > 0 ? diff : 0;
+          }
+        }      
+      window.openModal = function () {
+        modal.style.display = 'block';
+      };
+
+      window.closeModal = function () {
+        modal.style.display = 'none';
+      };
+
+      window.addEvent = function () {
+        const title = document.getElementById('eventTitle').value.trim();
+        const start = document.getElementById('eventStart').value;
+        const end = document.getElementById('eventEnd').value;
+        const color = document.getElementById('eventColor').value;
+
+        if (!title || !start || !end) {
+          alert('Semua field wajib diisi.');
+          return;
+        }
+
+        const newEvent = {
+          title,
+          start,
+          end,
+          backgroundColor: color,
+          borderColor: color,
+          textColor: '#fff'
+        };
+
+        calendar.addEvent(newEvent);
+        agendaData.push({ title, start }); // untuk daftar agenda saja
+        renderAgenda(agendaData);
+
+        closeModal();
+        document.getElementById('eventTitle').value = '';
+        document.getElementById('eventStart').value = '';
+        document.getElementById('eventEnd').value = '';
+        document.getElementById('eventDays').value = '';
+        document.getElementById('eventColor').value = '#ff0000';
+      };
+    });
+  </script>
+
+</body>
+</html>
