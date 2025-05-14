@@ -2,18 +2,8 @@ from django.conf import settings
 from django.db import models
 
 # Create your models here.
-
-class TahunAkademik(models.Model):
-    tahun_akademik = models.CharField(max_length=10)
-    def __str__(self):
-        return self.tahun_akademik
-
-class Kategori(models.Model):
-    nama = models.CharField(max_length=25)
-    warna = models.CharField(unique=True,
-        max_length=7,  
-        choices = [
-        ('#a9a9a9', 'Abu-abu'),
+COLOR_CHOICES = [
+    ('#a9a9a9', 'Abu-abu'),
         ('#7a8b8b', 'Abu-abu Biru'),
         ('#6e7b8b', 'Abu-abu Biru Gelap'),
         ('#c1cdc1', 'Abu-abu Hijau'),
@@ -160,7 +150,18 @@ class Kategori(models.Model):
         ('#ff69b4', 'Pink Cerah'), 
         ('#ff1493', 'Pink Tua'), 
         ('#ff83fa', 'Orchid Cerah'), 
-        ],
+]
+
+class TahunAkademik(models.Model):
+    tahun_akademik = models.CharField(max_length=10)
+    def __str__(self):
+        return self.tahun_akademik
+
+class Kategori(models.Model):
+    nama = models.CharField(max_length=25)
+    warna = models.CharField(unique=True,
+        max_length=7,  
+        choices = COLOR_CHOICES,
         default='#00205b'
     )
     def __str__(self):
