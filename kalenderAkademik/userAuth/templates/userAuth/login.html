@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login Kaldik UMS{% endblock %}
+{% block extra_head %}
+    <style>
+        body {
+            background: none; /* Override background dari base */
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="auth-login">
+        <div class="auth-login-container">
+            <div class="auth-login-box">
+                <div class="auth-left-logo">
+                    <img src="{% static 'userAuth/assets/logo.png' %}" alt="Logo UMS"/>
+                </div>
+                <div class="auth-right-form">
+                    <h3>Selamat datang di <strong>KALDIK</strong></h3>
+                    <p>Kalender Akademik<br>Universitas Muhammadiyah Surakarta</p>
+                    {% if form.errors %}
+                        <p style="color: red; font-size: 0.9rem;">Username/Email atau kata sandi salah.</p>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.username }}
+                        {{ form.password }}
+                        <div class="button-group">
+                            <button type="submit" class="btn yellow">Login</button>
+                            <button type="button" class="btn blue">Login CAS</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

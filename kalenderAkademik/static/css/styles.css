@@ -1,0 +1,1336 @@
+/* Reset dan pengaturan global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+}
+
+body:not(.auth-login) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #eef3fb;
+}
+
+/* Style Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e3a8a;
+    padding: 10px 20px;
+    color: white;
+    border-bottom: 5px solid #f4c430;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1000;
+}
+
+.navbar .logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.navbar .logo-container a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
+
+.navbar .logo {
+    width: 60px;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+.navbar .logo-container a:hover .logo {
+    transform: scale(1.1);
+}
+
+.navbar .university-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    transition: color 0.3s ease;
+}
+
+.navbar .university-text span:first-child {
+    font-size: 24px;
+}
+
+.navbar .university-text:hover {
+    color: #f4c430;
+}
+
+.navbar .hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: #f4c430;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar .hamburger:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.navbar .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.navbar .nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+}
+
+.navbar .nav-menu li {
+    margin: 0;
+}
+
+.navbar .nav-menu .nav-link {
+    color: white;
+    padding: 8px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-weight: 500;
+}
+
+.navbar .nav-menu .nav-link:hover {
+    background-color: #f4c430;
+    color: #1e3a8a;
+}
+
+.navbar .nav-menu .nav-link.active {
+    color: #f4c430;
+}
+
+.navbar .nav-menu .nav-link.active:hover {
+    background-color: #1e3a8a;
+    color: #f4c430;
+}
+
+.navbar .user-dropdown .user-dropdown-info {
+    display: block;
+    padding: 10px 20px;
+    color: #f4c430;
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar .user-dropdown {
+    min-width: 160px;
+}
+
+.navbar .nav-menu .mobile-username {
+    color: #f4c430;
+    padding: 10px 20px;
+    font-size: 15px;
+    text-align: right;
+    display: block;
+    font-weight: bold;
+    cursor: default;
+}
+
+.navbar .nav-menu .mobile-username:hover {
+    background-color: transparent;
+    color: #f4c430;
+}
+
+.navbar .user-menu {
+    position: relative;
+}
+
+.navbar .user-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.navbar .user-btn:hover {
+    transform: scale(1.1);
+}
+
+.navbar .user-icon {
+    width: 30px;
+    height: 30px;
+    transition: transform 0.3s ease;
+}
+
+.navbar .user-btn:hover .user-icon {
+    transform: scale(1.1);
+}
+
+.navbar .user-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #1e3a8a;
+    border: 1px solid #f4c430;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    list-style: none;
+    padding: 10px 0;
+    margin: 5px 0 0 0;
+    width: 120px;
+    z-index: 1001;
+}
+
+.navbar .user-dropdown.show {
+    display: block;
+}
+
+.navbar .user-dropdown li {
+    margin: 0;
+}
+
+.navbar .user-dropdown .user-action {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: right;
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar .user-dropdown .user-action:last-child {
+    border-bottom: none;
+}
+
+.navbar .user-dropdown .user-action:hover {
+    background-color: #f4c430;
+    color: #1e3a8a;
+}
+
+/* Style Beranda (Home) */
+.home-page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+.home-page-header {
+    background-size: cover;
+    background-position: center;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: white;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.home-page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.home-page-judul {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+}
+
+.home-page-judul h1 {
+    font-size: 36px;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.home-page-judul p {
+    font-size: 20px;
+    color: white;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.home-page-main {
+    background-color: white;
+    margin: 15px;
+    padding: 20px;
+    max-width: 900px;
+    width: 100%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    text-align: center;
+    min-height: 400px;
+    flex: 1;
+}
+
+.home-page-section {
+    margin-bottom: 15px;
+    text-align: left;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.home-page-section.announcement {
+    background-color: #fffacd;
+    border: 1px solid #f0e68c;
+}
+
+.home-page-section.events {
+    background-color: #e0ffe0;
+    border: 1px solid #c1e0c1;
+}
+
+.home-page-section h2 {
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.home-page-section h2 .section-icon {
+    margin-right: 10px;
+    font-size: 1.1em;
+}
+
+.home-page-section.announcement h2 .section-icon {
+    color: #DAA520;
+}
+
+.home-page-section.events h2 .section-icon {
+    color: #2E8B57;
+}
+
+.home-page-section ul {
+    list-style: none;
+    padding-left: 5px;
+    margin-bottom: 0;
+}
+
+.home-page-section ul li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #555;
+    padding-left: 20px;
+    position: relative;
+}
+
+.home-page-section ul li::before {
+    content: "-";
+    position: absolute;
+    left: 0;
+    color: #777;
+}
+
+.loading-data, .no-data {
+    font-style: italic;
+    color: #777;
+}
+
+.no-data::before {
+    content: "";
+}
+
+/* Style AboutUs */
+.about-content {
+    margin: 15px auto;
+    padding: 15px 30px;
+}
+
+.about-content h1 {
+    font-size: 28px;
+    color: #1e3a8a;
+    margin-bottom: 8px;
+}
+
+.about-content p {
+    color: #2F318B;
+    font-size: 16px;
+    font-style: normal;
+}
+
+.about-content ul {
+    list-style-type: none;
+    padding: 5px;
+}
+
+.about-content ul li {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.about-content ul li::before {
+    content: "•";
+    color: #1e3a8a;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+.about-content .contact {
+    font-size: 14px;
+}
+
+.about-content .contact a {
+    color: #1e3a8a;
+    text-decoration: none;
+}
+
+.about-content .contact a:hover {
+    text-decoration: underline;
+}
+
+/* Style Kalender */
+.kalender-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+.kalender-main-container {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.kalender-calendar-container {
+    flex: 2;
+    min-width: 300px;
+}
+
+.kalender-calendar-container #calendar {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.kalender-agenda-section {
+    flex: 1;
+    min-width: 300px;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.kalender-agenda-section h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+}
+
+.kalender-agenda-section input {
+    width: 100%;
+    padding: 0.6rem;
+    margin: 0 0 1rem 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.kalender-agenda-item {
+    margin-bottom: 1rem;
+    position: relative;
+    padding-left: 1.2rem;
+    border-left: 4px solid #00205b;
+}
+
+.kalender-agenda-item-title {
+    font-weight: bold;
+    color: #00205b;
+    padding-right: 35px;
+    font-size: 1rem;
+}
+
+.kalender-agenda-date {
+    margin: 0.2rem 0;
+    font-size: 0.85rem;
+}
+
+.kalender-agenda-location {
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.kalender-btn-gcal {
+    background-color: #ffcc00;
+    color: #00205b;
+    border: none;
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 0.6rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.kalender-btn-gcal:hover {
+    background-color: #e6b800;
+}
+
+.kalender-btn-bell {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.kalender-btn-bell:hover {
+    background-color: #e6b800;
+}
+
+/* Style Kalender - FullCalendar */
+.fc-header-toolbar .fc-button {
+    color: white !important;
+    background-color: #1e3a8a !important;
+    border: none !important;
+}
+
+.fc-header-toolbar .fc-toolbar-title {
+    color: #1e3a8a !important;
+}
+
+.fc-header-toolbar .fc-button:hover {
+    background-color: #11255c !important;
+}
+
+/* Style Kalender - Custom Alert Bar */
+.custom-alert-bar {
+    position: fixed;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 320px;
+    max-width: 90%;
+    width: auto;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    transition: top 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.custom-alert-bar.show {
+    top: 20px;
+    opacity: 1;
+}
+
+.custom-alert-bar.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.custom-alert-bar.error .custom-alert-close-btn {
+    color: #721c24;
+}
+
+.custom-alert-bar.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.custom-alert-bar.success .custom-alert-close-btn {
+    color: #155724;
+}
+
+.custom-alert-bar.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.custom-alert-bar.info .custom-alert-close-btn {
+    color: #0c5460;
+}
+
+#customAlertMessage {
+    flex-grow: 1;
+    margin-right: 1rem;
+}
+
+.custom-alert-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 0.2rem;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.custom-alert-close-btn:hover {
+    opacity: 1;
+}
+
+/* Style Kalender - Modal */
+.kalender-page-modal {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.kalender-page-modal.show {
+    display: flex;
+}
+
+.kalender-modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.kalender-close-btn {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+}
+
+.kalender-close-btn:hover {
+    color: #1e3a8a;
+}
+
+.kalender-modal-content h3 {
+    color: #1e3a8a;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+
+.kalender-modal-content p {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.8rem;
+}
+
+.kalender-modal-content label {
+    display: block;
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.3rem;
+}
+
+.kalender-modal-content input[type="text"],
+.kalender-modal-content input[type="date"],
+.kalender-modal-content select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    margin-bottom: 0.8rem;
+}
+
+.kalender-modal-content input[readonly] {
+    background-color: #f5f5f5;
+}
+
+.notification-options-group {
+    margin-bottom: 1rem;
+}
+
+.notification-options-group > label {
+    margin-bottom: 0.6rem_annotation;
+}
+
+.notification-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.notification-option input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+    margin-bottom: 0;
+    padding: 0;
+    -webkit-appearance: radio;
+    -moz-appearance: radio;
+    appearance: radio;
+    opacity: 1;
+    position: static;
+}
+
+.notification-option label {
+    font-weight: normal;
+    margin-bottom: 0;
+    display: inline;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.kalender-btn-add {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.kalender-btn-add:hover {
+    background-color: #11255c;
+}
+
+.kalender-btn-submit {
+    width: 100%;
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.kalender-btn-submit:hover {
+    background-color: #11255c;
+}
+
+/* Style Kalender - Agenda Actions */
+.kalender-agenda-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.kalender-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem;
+    font-size: 1.1rem;
+    color: #555;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kalender-action-btn:hover {
+    transform: scale(1.1);
+}
+
+.kalender-action-btn.edit:hover {
+    color: #28a745;
+}
+
+.kalender-action-btn.delete:hover {
+    color: #dc3545;
+}
+
+.kalender-action-btn.gcal img {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.kalender-action-btn.gcal:hover img {
+    opacity: 0.75;
+}
+
+.kalender-btn-bell-icon {
+    background-color: #fff352;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    color: #333;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px 8px rgba(255, 243, 82, 0.7);
+}
+
+.kalender-btn-bell-icon:hover {
+    color: #000;
+    transform: scale(1.05);
+    box-shadow: 0px 0px 12px rgba(255, 243, 82, 1);
+    background-color: #ffeb3b;
+}
+
+/* Style Kalender - Modal Konfirmasi Hapus */
+.kalender-btn-confirm,
+.kalender-btn-cancel {
+    width: 48%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.kalender-btn-confirm {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.kalender-btn-confirm:hover {
+    background-color: #c82333;
+}
+
+.kalender-btn-cancel {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.kalender-btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+/* Style Login */
+.auth-login {
+    background: url('../userAuth/assets/background.jpg') no-repeat center center;
+    background-size: cover;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.auth-login-box {
+    display: flex;
+    width: 750px;
+    max-width: 90%;
+    gap: 50px;
+}
+
+.auth-left-logo img {
+    align-items: top;
+    width: 20vh;
+}
+
+.auth-right-form {
+    border-radius: 20px;
+    padding: 20px 30px;
+    height: 45vh;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-right-form h3 {
+    font-size: 24px;
+    font-weight: normal;
+    margin-bottom: 5px;
+    color: #003893;
+}
+
+.auth-right-form strong {
+    color: #003893;
+}
+
+.auth-right-form p {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #003893;
+}
+
+.auth-right-form form input {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.auth-right-form .button-group {
+    display: flex;
+    justify-content: right;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.auth-right-form .btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.auth-right-form .btn.yellow {
+    background-color: #ffe600;
+    color: black;
+}
+
+.auth-right-form .btn.blue {
+    background-color: #2a2a9e;
+    color: white;
+}
+
+/* Style Footer */
+.footer {
+    background-color: #1e3a8a;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.footer #footer_child {
+    font-size: 16px;
+}
+
+/* Responsif untuk Navbar */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 10px 15px;
+    }
+
+    .navbar .logo-container {
+        width: auto;
+    }
+
+    .navbar .hamburger {
+        display: block;
+        order: 2;
+    }
+
+    .navbar .nav-right {
+        position: static;
+    }
+
+    .navbar .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 15px;
+        background-color: #1e3a8a;
+        border: 1px solid #f4c430;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        flex-direction: column;
+        width: 200px;
+        padding: 10px 0;
+        margin-top: 5px;
+        z-index: 1001;
+    }
+
+    .navbar .nav-menu.show {
+        display: flex;
+    }
+
+    .navbar .nav-menu .nav-link {
+        padding: 10px 20px;
+        font-size: 16px;
+        text-align: right;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .navbar .auth-link.mobile-only button {
+        background-color: #1e3a8a;
+        width: 100%;
+        text-align: right;
+        margin-top: 10px;
+    }
+
+    .navbar .nav-menu .nav-link:last-child {
+        border-bottom: none;
+    }
+
+    .navbar .user-menu {
+        display: none;
+    }
+
+    .navbar .auth-link.mobile-only {
+        display: block;
+    }
+
+    .navbar .university-text {
+        font-size: 14px;
+    }
+
+    .navbar .university-text span:first-child {
+        font-size: 20px;
+    }
+
+    .navbar .logo {
+        width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 8px 10px;
+    }
+
+    .navbar .university-text {
+        font-size: 12px;
+    }
+
+    .navbar .university-text span:first-child {
+        font-size: 18px;
+    }
+
+    .navbar .logo {
+        width: 40px;
+    }
+
+    .navbar .nav-menu {
+        width: 180px;
+        right: 10px;
+    }
+
+    .navbar .nav-menu .nav-link {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+}
+
+/* Responsif untuk Beranda */
+@media (max-width: 768px) {
+    .home-page-header {
+        height: 250px;
+        padding: 40px 10px;
+    }
+
+    .home-page-judul h1 {
+        font-size: 28px;
+    }
+
+    .home-page-judul p {
+        font-size: 16px;
+    }
+
+    .home-page-main {
+        max-width: fit-content;
+        margin: 10px;
+        padding: 10px;
+        min-height: 300px;
+    }
+
+    .home-page-section {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-page-header {
+        height: 200px;
+    }
+
+    .home-page-judul h1 {
+        font-size: 24px;
+    }
+
+    .home-page-judul p {
+        font-size: 14px;
+    }
+
+    .home-page-main {
+        max-width: fit-content;
+        margin: 8px;
+        padding: 10px;
+    }
+}
+
+/* Responsif untuk About */
+@media (max-width: 768px) {
+    .about-content {
+        padding: 10px 20px;
+    }
+
+    .about-content h1 {
+        font-size: 24px;
+    }
+
+    .about-content p,
+    .about-content ul li {
+        font-size: 14px;
+    }
+}
+
+/* Responsif untuk Kalender */
+@media (max-width: 992px) {
+    .kalender-main-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .kalender-calendar-container,
+    .kalender-agenda-section {
+        width: 100%;
+        max-width: 700px;
+        flex: none;
+    }
+
+    .kalender-calendar-container {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .kalender-container {
+        padding: 1rem 0.8rem;
+    }
+
+    .kalender-agenda-section {
+        padding: 0.8rem;
+    }
+
+    .kalender-agenda-item-title {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .kalender-container {
+        padding: 0.8rem 0.5rem;
+    }
+
+    .kalender-agenda-section input {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .kalender-btn-gcal {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .kalender-fc-header-toolbar {
+        display: flex;
+        flex-direction: column !important;
+        gap: 0.4rem !important;
+        align-items: center !important;
+    }
+
+    .kalender-fc-header-toolbar .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 0.4rem;
+        gap: 0.4rem;
+    }
+
+    .kalender-fc-button-group {
+        display: flex !important;
+        gap: 0.2rem;
+    }
+
+    .kalender-fc-button {
+        padding: 0.3em 0.4em !important;
+        font-size: 0.8em !important;
+    }
+
+    .kalender-fc-toolbar-title {
+        font-size: 1em !important;
+        margin: 0.1em 0 !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.4rem !important;
+    }
+
+    .custom-alert-bar {
+        max-width: calc(100% - 20px);
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .kalender-modal-content {
+        padding: 1rem;
+        width: 95%;
+    }
+
+    .kalender-modal-content h3 {
+        font-size: 1.1rem;
+    }
+
+    .kalender-modal-content label,
+    .notification-option label {
+        font-size: 0.85rem;
+    }
+
+    .kalender-modal-content p {
+        font-size: 0.85rem;
+    }
+
+    .kalender-modal-content input[type="text"],
+    .kalender-modal-content input[type="date"],
+    .kalender-modal-content select {
+        font-size: 0.85rem;
+        padding: 0.4rem;
+    }
+
+    .kalender-btn-add,
+    .kalender-btn-submit,
+    .kalender-btn-confirm,
+    .kalender-btn-cancel {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Responsif untuk Login */
+@media (max-width: 768px) {
+    .auth-login-box {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .auth-left-logo img {
+        width: 15vh;
+    }
+
+    .auth-right-form {
+        padding: 15px 20px;
+        height: auto;
+        min-height: 40vh;
+    }
+
+    .auth-right-form h3 {
+        font-size: 20px;
+    }
+
+    .auth-right-form p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-right-form {
+        padding: 10px 15px;
+    }
+
+    .auth-right-form h3 {
+        font-size: 18px;
+    }
+
+    .auth-right-form p {
+        font-size: 12px;
+    }
+
+    .auth-right-form .btn {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
+
+/* Utility Classes */
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+
+    .mobile-only {
+        display: block;
+    }
+}
