@@ -33,8 +33,10 @@
   pip install djangorestframework
   pip install requests
   pip install celery[redis]
+  pip install pytz
   pip install mysqlclient  # Opsional, jika menggunakan MySQL
   pip install django-jazzmin # Style custom panel admin
+  python manage.py populate_kalender
   ```
 
 ### 4. Instal Redis dan Node.js
@@ -83,11 +85,13 @@
   ```
 
 ### 7. Jalankan Komponen Proyek
-- Pastikan semua komponen berjalan di terminal terpisah:
-  1. **Jalankan Redis:**
-     - Buka terminal baru dan jalankan:
+- Pastikan semua komponen berjalan di terminal terpisah dan mengaktifkan virtual(ENV/env):
+  1. **Cek Redis apakah berjalan:**
+     - Cek service:
        ```bash
-       redis-server
+       WIN + R
+       Input: services.msc
+       Cari name redist, pastikan status running
        ```
   2. **Jalankan Celery Beat dan Worker:**
      - Buka dua terminal baru di direktori root proyek (`KalenderAkademik-capstone/kalenderAkademik`):

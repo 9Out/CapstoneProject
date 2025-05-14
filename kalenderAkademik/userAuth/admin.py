@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import CustomUser
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserAddForm
+from django import forms
+from django.db import models
 
 # Register your models here.
 
@@ -30,5 +32,8 @@ class CustomUserAdmin(UserAdmin):
     )
     
     add_form = CustomUserAddForm
+    formfield_overrides = {
+        models.ForeignKey: {'widget': forms.Select},
+    }
 
 admin.site.register(CustomUser, CustomUserAdmin)

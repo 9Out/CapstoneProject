@@ -212,7 +212,6 @@
 
     // Variabel Konfigurasi
     /** Konfigurasi untuk ID pengguna, kategori, dan timeout alert */
-    const currentUserId = {{ user_id|default: 'null' }};
     const KATEGORI_PENGUMUMAN_LOWERCASE = "pengumuman";
     let alertTimeout;
 
@@ -360,6 +359,7 @@
 
     /** Menampilkan daftar agenda ke dalam UI */
     function renderAgenda(agendaList) {
+        const currentUserId = {{ user_id|default:'null' }};
         agendaContainer.innerHTML = '';
         const filteredAgendaList = agendaList.filter(agenda =>
             !agenda.kategori || agenda.kategori.toLowerCase() !== KATEGORI_PENGUMUMAN_LOWERCASE
@@ -397,6 +397,7 @@
                     }
                 }
             }
+            
             const agendaEl = document.createElement('div');
             agendaEl.className = 'kalender-agenda-item';
             agendaEl.style.borderLeftColor = agenda.backgroundColor || '#ff0000';

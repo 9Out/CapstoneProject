@@ -89,9 +89,9 @@
 
     <!-- Skrip JavaScript -->
     <script src="{% static 'js/scripts.js' %}"></script>
-    <script>
-
-    </script>
+<script>
+  const currentUserName = '{{ user.username|default:"Tamu"|escapejs }}';
+</script>
 </body>
 
 </html>
