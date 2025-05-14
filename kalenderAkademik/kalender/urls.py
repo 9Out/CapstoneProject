@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from . import views
 # from .views import KegiatanViewSet
-from .views import KegiatanListView, save_notification
+from .views import KegiatanListView, save_notification, category_list, add_kegiatan
 
 
 app_name = 'kalender'
@@ -15,6 +15,12 @@ urlpatterns = [
     # path('kegiatan/', include(router.urls)),
     path('events/', KegiatanListView.as_view(), name='kegiatan-list'),
     path('save-notification/', save_notification, name='save-notification'),
+    path('categories/', category_list, name='category-list'),
+    path('events/add/', add_kegiatan, name='add-kegiatan'),
+    path('events/update/<int:id>/', views.update_kegiatan, name='update-kegiatan'),
+    path('events/delete/<int:id>/', views.delete_kegiatan, name='delete-kegiatan'),
+    
+    
 ]
 
 

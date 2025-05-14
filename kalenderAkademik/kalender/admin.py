@@ -11,7 +11,7 @@ class KategoriAdmin(admin.ModelAdmin):
     
 @admin.register(Kegiatan)
 class KegiatanAdmin(admin.ModelAdmin):
-    list_display = ('id','tahun_akademik', 'semester', 'kategori_fk', 'nama', 'tgl_mulai', 'tgl_selesai')
+    list_display = ('id','tahun_akademik', 'semester', 'kategori_fk', 'nama', 'tgl_mulai', 'tgl_selesai', 'deskripsi')
     search_fields = ('nama',)
     list_filter = ('tahun_akademik', 'kategori_fk',)
     ordering = ('id',)

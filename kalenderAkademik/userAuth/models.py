@@ -19,6 +19,6 @@ class CustomUser(AbstractUser):
         if self.peran:
             try:
                 group = Group.objects.get(name=self.peran)
-                self.groups.set([group])  # grup berdasarkan peran
+                self.groups.set([group])  
             except Group.DoesNotExist:
                 raise ValueError("Peran harus sesuai dengan grup yang sudah ada.")

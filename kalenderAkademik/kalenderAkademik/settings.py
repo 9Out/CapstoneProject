@@ -49,7 +49,7 @@ INSTALLED_APPS = [
 JAZZMIN_SETTINGS = {
     "changeform_format": "default", 
     "show_ui_builder": True,  
-    "site_logo": "assets/LOGO_HD.png",
+    "site_logo": "assets/logo.png",
     "site_title": "Administrator Kalender Akademik",
     "site_header": "Kalender Akademik",
     "icons": {

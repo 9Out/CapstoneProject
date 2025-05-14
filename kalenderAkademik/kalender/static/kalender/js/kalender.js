@@ -1,167 +1,4 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}Kalender Akademik UMS{% endblock %}
-{% block extra_head %}
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-{% endblock %}
-{% block content %}
-<!-- Komponen Alert Kustom -->
-<div id="customAlertBar" class="custom-alert-bar">
-    <span id="customAlertMessage"></span>
-    <button id="customAlertCloseBtn" class="custom-alert-close-btn">×</button>
-</div>
-
-<!-- Komponen Utama Kalender -->
-<div class="kalender-container">
-    <div class="kalender-main-container">
-        <!-- Kontainer Kalender -->
-        <div class="kalender-calendar-container">
-            <div id="calendar"></div>
-        </div>
-        <!-- Seksi Agenda -->
-        <div class="kalender-agenda-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2>Agenda Akademik</h2>
-                {% if user.is_authenticated %}
-                {% if perms.kalender.add_kegiatan %}
-                <button onclick="openModal()" class="kalender-btn-add">Tambah</button>
-                {% endif %}
-                {% endif %}
-            </div>
-
-            <!-- Modal Tambah Kegiatan -->
-            <div id="eventModal" class="kalender-page-modal">
-                <div class="kalender-modal-content">
-                    <span id="closeEventModalBtn" class="kalender-close-btn">×</span>
-                    <h3>Tambah Kegiatan</h3>
-                    <form id="eventForm">
-                        <label for="eventTitle">Nama Kegiatan</label>
-                        <input type="text" id="eventTitle" name="nama" placeholder="Nama Kegiatan" required />
-
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="eventStart">Tanggal Mulai</label>
-                                <input type="date" id="eventStart" name="start" required />
-                            </div>
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="eventEnd">Tanggal Selesai</label>
-                                <input type="date" id="eventEnd" name="end" />
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="eventDays">Jumlah Hari</label>
-                                <input type="text" id="eventDays" readonly />
-                            </div>
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="eventCategory">Kategori</label>
-                                <select id="eventCategory" name="kategori_id" required>
-                                    <option value="">Pilih Kategori</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <label for="eventDescription" style="margin-top: 0.5rem;">Deskripsi/Lokasi</label>
-                        <input type="text" id="eventDescription" name="deskripsi" placeholder="Deskripsi atau Lokasi" />
-
-                        <button type="submit" class="kalender-btn-submit">Tambah Kegiatan</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Modal Edit Kegiatan -->
-            <div id="editEventModal" class="kalender-page-modal">
-                <div class="kalender-modal-content">
-                    <span id="closeEditEventModalBtn" class="kalender-close-btn">×</span>
-                    <h3>Edit Kegiatan</h3>
-                    <form id="editEventForm">
-                        <input type="hidden" id="editEventId" name="event_id">
-                        <label for="editEventTitle">Nama Kegiatan</label>
-                        <input type="text" id="editEventTitle" name="nama" placeholder="Nama Kegiatan" required />
-
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="editEventStart">Tanggal Mulai</label>
-                                <input type="date" id="editEventStart" name="start" required />
-                            </div>
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="editEventEnd">Tanggal Selesai</label>
-                                <input type="date" id="editEventEnd" name="end" />
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="editEventDays">Jumlah Hari</label>
-                                <input type="text" id="editEventDays" readonly />
-                            </div>
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="editEventCategory">Kategori</label>
-                                <select id="editEventCategory" name="kategori_id" required>
-                                    <option value="">Pilih Kategori</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <label for="editEventDescription" style="margin-top: 0.5rem;">Deskripsi/Lokasi</label>
-                        <input type="text" id="editEventDescription" name="deskripsi" placeholder="Deskripsi atau Lokasi" />
-
-                        <button type="submit" class="kalender-btn-submit">Simpan Perubahan</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Modal Konfirmasi Hapus -->
-            <div id="deleteConfirmModal" class="kalender-page-modal">
-                <div class="kalender-modal-content">
-                    <span id="closeDeleteConfirmModalBtn" class="kalender-close-btn">×</span>
-                    <h3>Konfirmasi Hapus</h3>
-                    <p id="deleteConfirmMessage">Apakah Anda yakin ingin menghapus kegiatan ini?</p>
-                    <input type="hidden" id="deleteEventId" name="event_id">
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <button type="button" id="confirmDeleteBtn" class="kalender-btn-confirm">Ya</button>
-                        <button type="button" id="cancelDeleteBtn" class="kalender-btn-cancel">Tidak</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Notifikasi -->
-            <div id="notificationModal" class="kalender-page-modal">
-                <div class="kalender-modal-content">
-                    <span id="closeNotificationModalBtn" class="kalender-close-btn">×</span>
-                    <h3>Setel Notifikasi</h3>
-                    <p>Kegiatan: <strong id="notificationEventTitle"></strong></p>
-                    <form id="notificationForm">
-                        <input type="hidden" id="notificationEventId" name="kegiatan_id_notif">
-                        <div class="notification-options-group">
-                            <label>Metode Notifikasi:</label>
-                            <div class="notification-option">
-                                <input type="radio" id="notifMethodEmail" name="notifMethod" value="email" checked>
-                                <label for="notifMethodEmail">Email</label>
-                            </div>
-                            <div class="notification-option">
-                                <input type="radio" id="notifMethodWhatsapp" name="notifMethod" value="whatsapp">
-                                <label for="notifMethodWhatsapp">WhatsApp</label>
-                            </div>
-                        </div>
-                        <button type="submit" class="kalender-btn-submit">Simpan Notifikasi</button>
-                    </form>
-                </div>
-            </div>
-
-            <input type="text" id="search" placeholder="cari agenda..." onkeyup="filterAgenda()">
-            <div id="agenda-container"></div>
-        </div>
-    </div>
-</div>
-
-<!-- Skrip JavaScript -->
-<!-- <script src="{% static 'kalender/js/kalender.js' %}"></script> -->
-<script>
-    // const currentUserId = {{ user_id|default:'null' }};
-    // Variabel untuk elemen DOM
+// Variabel untuk elemen DOM
 const calendarEl = document.getElementById('calendar');
 const agendaContainer = document.getElementById('agenda-container');
 const customAlertBar = document.getElementById('customAlertBar');
@@ -440,16 +277,12 @@ function renderAgenda(agendaList) {
 
             if (currentUserId && agenda.user_fk === currentUserId) {
                 actionButtonsHTML += `
-                {% if perms.kalender.change_kegiatan %}
                     <button class="kalender-action-btn edit" title="Edit Kegiatan" onclick="openEditModal(${agenda.id}, '${agenda.title.replace(/'/g, "\\'")}', '${agenda.start}', '${agenda.end || ''}', ${agenda.kategori_id}, '${agenda.deskripsi ? agenda.deskripsi.replace(/'/g, "\\'") : ''}')">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                {% endif %}
-                {% if perms.kalender.add_kegiatan %}
                     <button class="kalender-action-btn delete" title="Hapus Kegiatan" onclick="openDeleteConfirmModal(${agenda.id}, '${agenda.title.replace(/'/g, "\\'")}')">
                         <i class="fas fa-trash-alt"></i>
                     </button>
-                {% endif %}
                 `;
             }
         }
@@ -943,5 +776,3 @@ document.addEventListener('DOMContentLoaded', function () {
     // Memuat agenda awal
     loadAgenda(calendar.view.activeStart, calendar.view.activeEnd);
 });
-</script>
-{% endblock %}

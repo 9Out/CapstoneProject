@@ -13,7 +13,6 @@ html, body {
     line-height: 1.6;
 }
 
-/* Base layout untuk semua halaman kecuali login */
 body:not(.auth-login) {
     display: flex;
     flex-direction: column;
@@ -21,7 +20,7 @@ body:not(.auth-login) {
     background-color: #eef3fb;
 }
 
-/* Navbar (dari base.html) */
+/* Style Navbar */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -75,7 +74,7 @@ body:not(.auth-login) {
 }
 
 .navbar .hamburger {
-    display: none; 
+    display: none;
     background: none;
     border: none;
     color: #f4c430;
@@ -94,7 +93,7 @@ body:not(.auth-login) {
 .navbar .nav-right {
     display: flex;
     align-items: center;
-    gap: 5px; 
+    gap: 5px;
 }
 
 .navbar .nav-menu {
@@ -126,12 +125,40 @@ body:not(.auth-login) {
     color: #1e3a8a;
 }
 
-.navbar .nav-menu .nav-link.beranda {
+.navbar .nav-menu .nav-link.active {
     color: #f4c430;
 }
 
-.navbar .nav-menu .nav-link.beranda:hover {
+.navbar .nav-menu .nav-link.active:hover {
     background-color: #1e3a8a;
+    color: #f4c430;
+}
+
+.navbar .user-dropdown .user-dropdown-info {
+    display: block;
+    padding: 10px 20px;
+    color: #f4c430;
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar .user-dropdown {
+    min-width: 160px;
+}
+
+.navbar .nav-menu .mobile-username {
+    color: #f4c430;
+    padding: 10px 20px;
+    font-size: 15px;
+    text-align: right;
+    display: block;
+    font-weight: bold;
+    cursor: default;
+}
+
+.navbar .nav-menu .mobile-username:hover {
+    background-color: transparent;
     color: #f4c430;
 }
 
@@ -209,103 +236,143 @@ body:not(.auth-login) {
     color: #1e3a8a;
 }
 
-/* Footer */
-.footer {
-    background-color: #1e3a8a;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    width: 100%;
-}
-
-.footer #footer_child {
-    font-size: 16px;
-}
-
-/* Home App (index.html) */
-.home-container {
+/* Style Beranda (Home) */
+.home-page-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    font-family: Arial, sans-serif;
 }
 
-.home-header {
+.home-page-header {
     background-size: cover;
     background-position: center;
-    height: 300px; /* Tinggi header */
+    height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     color: white;
     text-align: center;
-    padding: 20px;
+    padding: 60px 20px;
 }
 
-.home-header::before {
+.home-page-header::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); 
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1;
 }
 
-.home-header .home-judul {
+.home-page-judul {
     position: relative;
-    z-index: 2; 
+    z-index: 2;
     margin: 0;
 }
 
-.home-judul h1 {
+.home-page-judul h1 {
     font-size: 36px;
-    color: white; 
-    margin-bottom: 8px;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
-.home-judul p {
+.home-page-judul p {
     font-size: 20px;
-    color: white; 
+    color: white;
     margin-bottom: 15px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 }
 
-.home-main {
+.home-page-main {
     background-color: white;
     margin: 15px;
     padding: 20px;
+    max-width: 900px;
+    width: 100%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
     text-align: center;
     min-height: 400px;
-    flex: 1; 
+    flex: 1;
 }
 
-.home-section {
+.home-page-section {
     margin-bottom: 15px;
     text-align: left;
-    padding: 8px 12px;
-    border-radius: 5px;
+    padding: 20px;
+    border-radius: 8px;
 }
 
-.home-section.announcement {
-    background-color: #fff9c4;
+.home-page-section.announcement {
+    background-color: #fffacd;
+    border: 1px solid #f0e68c;
 }
 
-.home-section.events {
-    background-color: #dcedc8;
+.home-page-section.events {
+    background-color: #e0ffe0;
+    border: 1px solid #c1e0c1;
 }
 
-.home-section ul {
-    list-style-type: none;
-    padding-left: 0;
+.home-page-section h2 {
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    display: flex;
+    align-items: center;
 }
 
-.home-section li {
-    font-size: 14px;
-    margin-bottom: 5px;
+.home-page-section h2 .section-icon {
+    margin-right: 10px;
+    font-size: 1.1em;
 }
 
-/* AboutUs App (about.html) */
+.home-page-section.announcement h2 .section-icon {
+    color: #DAA520;
+}
+
+.home-page-section.events h2 .section-icon {
+    color: #2E8B57;
+}
+
+.home-page-section ul {
+    list-style: none;
+    padding-left: 5px;
+    margin-bottom: 0;
+}
+
+.home-page-section ul li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #555;
+    padding-left: 20px;
+    position: relative;
+}
+
+.home-page-section ul li::before {
+    content: "-";
+    position: absolute;
+    left: 0;
+    color: #777;
+}
+
+.loading-data, .no-data {
+    font-style: italic;
+    color: #777;
+}
+
+.no-data::before {
+    content: "";
+}
+
+/* Style AboutUs */
 .about-content {
     margin: 15px auto;
     padding: 15px 30px;
@@ -355,7 +422,7 @@ body:not(.auth-login) {
     text-decoration: underline;
 }
 
-/* Kalender App (kalenderAkademik.html) */
+/* Style Kalender */
 .kalender-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -469,7 +536,343 @@ body:not(.auth-login) {
     background-color: #e6b800;
 }
 
-/* UserAuth App (login.html) */
+/* Style Kalender - FullCalendar */
+.fc-header-toolbar .fc-button {
+    color: white !important;
+    background-color: #1e3a8a !important;
+    border: none !important;
+}
+
+.fc-header-toolbar .fc-toolbar-title {
+    color: #1e3a8a !important;
+}
+
+.fc-header-toolbar .fc-button:hover {
+    background-color: #11255c !important;
+}
+
+/* Style Kalender - Custom Alert Bar */
+.custom-alert-bar {
+    position: fixed;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 320px;
+    max-width: 90%;
+    width: auto;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    transition: top 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.custom-alert-bar.show {
+    top: 20px;
+    opacity: 1;
+}
+
+.custom-alert-bar.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.custom-alert-bar.error .custom-alert-close-btn {
+    color: #721c24;
+}
+
+.custom-alert-bar.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.custom-alert-bar.success .custom-alert-close-btn {
+    color: #155724;
+}
+
+.custom-alert-bar.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.custom-alert-bar.info .custom-alert-close-btn {
+    color: #0c5460;
+}
+
+#customAlertMessage {
+    flex-grow: 1;
+    margin-right: 1rem;
+}
+
+.custom-alert-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 0.2rem;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.custom-alert-close-btn:hover {
+    opacity: 1;
+}
+
+/* Style Kalender - Modal */
+.kalender-page-modal {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.kalender-page-modal.show {
+    display: flex;
+}
+
+.kalender-modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.kalender-close-btn {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+}
+
+.kalender-close-btn:hover {
+    color: #1e3a8a;
+}
+
+.kalender-modal-content h3 {
+    color: #1e3a8a;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+
+.kalender-modal-content p {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.8rem;
+}
+
+.kalender-modal-content label {
+    display: block;
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.3rem;
+}
+
+.kalender-modal-content input[type="text"],
+.kalender-modal-content input[type="date"],
+.kalender-modal-content select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    margin-bottom: 0.8rem;
+}
+
+.kalender-modal-content input[readonly] {
+    background-color: #f5f5f5;
+}
+
+.notification-options-group {
+    margin-bottom: 1rem;
+}
+
+.notification-options-group > label {
+    margin-bottom: 0.6rem_annotation: Menyesuaikan jarak bawah label grup opsi notifikasi untuk konsistensi visual;
+}
+
+.notification-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.notification-option input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+    margin-bottom: 0;
+    padding: 0;
+    -webkit-appearance: radio;
+    -moz-appearance: radio;
+    appearance: radio;
+    opacity: 1;
+    position: static;
+}
+
+.notification-option label {
+    font-weight: normal;
+    margin-bottom: 0;
+    display: inline;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.kalender-btn-add {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.kalender-btn-add:hover {
+    background-color: #11255c;
+}
+
+.kalender-btn-submit {
+    width: 100%;
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.kalender-btn-submit:hover {
+    background-color: #11255c;
+}
+
+/* Style Kalender - Agenda Actions */
+.kalender-agenda-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.kalender-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem;
+    font-size: 1.1rem;
+    color: #555;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kalender-action-btn:hover {
+    transform: scale(1.1);
+}
+
+.kalender-action-btn.edit:hover {
+    color: #28a745;
+}
+
+.kalender-action-btn.delete:hover {
+    color: #dc3545;
+}
+
+.kalender-action-btn.gcal img {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.kalender-action-btn.gcal:hover img {
+    opacity: 0.75;
+}
+
+.kalender-btn-bell-icon {
+    background-color: #fff352;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    color: #333;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px 8px rgba(255, 243, 82, 0.7);
+}
+
+.kalender-btn-bell-icon:hover {
+    color: #000;
+    transform: scale(1.05);
+    box-shadow: 0px 0px 12px rgba(255, 243, 82, 1);
+    background-color: #ffeb3b;
+}
+
+/* Style Kalender - Modal Konfirmasi Hapus */
+.kalender-btn-confirm,
+.kalender-btn-cancel {
+    width: 48%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.kalender-btn-confirm {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.kalender-btn-confirm:hover {
+    background-color: #c82333;
+}
+
+.kalender-btn-cancel {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.kalender-btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+/* Style Login */
 .auth-login {
     background: url('../userAuth/assets/background.jpg') no-repeat center center;
     background-size: cover;
@@ -561,6 +964,19 @@ body:not(.auth-login) {
     color: white;
 }
 
+/* Style Footer */
+.footer {
+    background-color: #1e3a8a;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.footer #footer_child {
+    font-size: 16px;
+}
+
 /* Responsif untuk Navbar */
 @media (max-width: 768px) {
     .navbar {
@@ -575,11 +991,11 @@ body:not(.auth-login) {
 
     .navbar .hamburger {
         display: block;
-        order: 2; 
+        order: 2;
     }
 
     .navbar .nav-right {
-        position: static; 
+        position: static;
     }
 
     .navbar .nav-menu {
@@ -595,11 +1011,11 @@ body:not(.auth-login) {
         width: 200px;
         padding: 10px 0;
         margin-top: 5px;
-        z-index: 1001; 
+        z-index: 1001;
     }
 
     .navbar .nav-menu.show {
-        display: flex; 
+        display: flex;
     }
 
     .navbar .nav-menu .nav-link {
@@ -608,6 +1024,7 @@ body:not(.auth-login) {
         text-align: right;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .navbar .auth-link.mobile-only button {
         background-color: #1e3a8a;
         width: 100%;
@@ -620,7 +1037,7 @@ body:not(.auth-login) {
     }
 
     .navbar .user-menu {
-        display: none; 
+        display: none;
     }
 
     .navbar .auth-link.mobile-only {
@@ -668,41 +1085,46 @@ body:not(.auth-login) {
     }
 }
 
-/* Responsif untuk Home */
+/* Responsif untuk Beranda */
 @media (max-width: 768px) {
-    .home-header {
+    .home-page-header {
         height: 250px;
+        padding: 40px 10px;
     }
 
-    .home-judul h1 {
+    .home-page-judul h1 {
         font-size: 28px;
     }
 
-    .home-judul p {
+    .home-page-judul p {
         font-size: 16px;
     }
 
-    .home-main {
+    .home-page-main {
         margin: 10px;
-        padding: 15px;
+        padding: 10px;
         min-height: 300px;
+    }
+
+    .home-page-section {
+        padding: 15px;
     }
 }
 
 @media (max-width: 480px) {
-    .home-header {
-        height: 200px; 
+    .home-page-header {
+        height: 200px;
     }
 
-    .home-judul h1 {
+    .home-page-judul h1 {
         font-size: 24px;
     }
 
-    .home-judul p {
+    .home-page-judul p {
         font-size: 14px;
     }
 
-    .home-main {
+    .home-page-main {
         margin: 8px;
         padding: 10px;
     }
@@ -800,6 +1222,49 @@ body:not(.auth-login) {
     .kalender-fc-toolbar-title {
         font-size: 1em !important;
         margin: 0.1em 0 !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.4rem !important;
+    }
+
+    .custom-alert-bar {
+        max-width: calc(100% - 20px);
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .kalender-modal-content {
+        padding: 1rem;
+        width: 95%;
+    }
+
+    .kalender-modal-content h3 {
+        font-size: 1.1rem;
+    }
+
+    .kalender-modal-content label,
+    .notification-option label {
+        font-size: 0.85rem;
+    }
+
+    .kalender-modal-content p {
+        font-size: 0.85rem;
+    }
+
+    .kalender-modal-content input[type="text"],
+    .kalender-modal-content input[type="date"],
+    .kalender-modal-content select {
+        font-size: 0.85rem;
+        padding: 0.4rem;
+    }
+
+    .kalender-btn-add,
+    .kalender-btn-submit,
+    .kalender-btn-confirm,
+    .kalender-btn-cancel {
+        font-size: 0.85rem;
+        padding: 0.5rem;
     }
 }
 

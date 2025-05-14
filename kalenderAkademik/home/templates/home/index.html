@@ -6,28 +6,33 @@ Home
 {% endblock %}
 
 {% block content %}
-<div class="home-container">
-    <header class="home-header" style="background-image: url('{% static 'assets/siwal.jpg' %}');">
-        <div class="home-judul">
-            <h1>Sistem Informasi Akademik UMS</h1>
-            <p>Website Resmi Sistem Informasi Akademik Universitas Muhammadiyah Surakarta</p>
+<!-- Komponen Utama Halaman Beranda -->
+<div class="home-page-container">
+    <!-- Header Beranda -->
+    <header class="home-page-header" style="background-image: url('{% static 'assets/siwal.jpg' %}');">
+        <div class="home-page-judul">
+            <h1>Portal Informasi Kalender Akademik UMS</h1>
+            <p>Portal ini merupakan sistem informasi berbasis web yang menyediakan akses cepat dan terpusat terhadap seluruh jadwal akademik resmi Universitas Muhammadiyah Surakarta</p>
         </div>
     </header>
-    <div class="home-main">
-        <div class="home-section announcement">
-            <h2>Pengumuman</h2>
-            <ul>
-                <li>Pengumuman 1: Pendaftaran semester baru dimulai tanggal 1 Juli 2025.</li>
-                <li>Pengumuman 2: Ujian akhir semester akan dilaksanakan pada 15-20 Desember 2025.</li>
+    <!-- Konten Utama Beranda -->
+    <div class="home-page-main">
+        <!-- Seksi Pengumuman -->
+        <div class="home-page-section announcement">
+            <h2><i class="fas fa-bullhorn section-icon"></i>Pengumuman</h2>
+            <ul id="pengumuman-list">
+                <li class="loading-data">Memuat pengumuman...</li>
             </ul>
         </div>
-        <div class="home-section events">
-            <h2>Kegiatan</h2>
-            <ul>
-                <li>Kegiatan 1: Seminar Nasional Teknologi Informasi, 25 November 2025.</li>
-                <li>Kegiatan 2: Pekan Olahraga Mahasiswa, 5-10 Desember 2025.</li>
+        <!-- Seksi Kegiatan -->
+        <div class="home-page-section events">
+            <h2><i class="fas fa-calendar-alt section-icon"></i>Kegiatan Terdekat</h2>
+            <ul id="kegiatan-list">
+                <li class="loading-data">Memuat kegiatan...</li>
             </ul>
         </div>
     </div>
 </div>
+<!-- Skrip JavaScript -->
+<script src="{% static 'home/js/home.js' %}"></script>
 {% endblock %}
