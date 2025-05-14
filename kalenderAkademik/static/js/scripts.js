@@ -29,15 +29,15 @@ function closeMenusOnOutsideClick(event) {
     const hamburger = document.querySelector('.navbar .hamburger');
     const userBtn = document.querySelector('.navbar .user-btn');
 
+    // Variabel dideklarasikan dengan garis bawah (underscore)
     const isClick_insideNavMenu = navMenu && navMenu.contains(event.target);
     const isClickOnHamburger = hamburger && hamburger.contains(event.target);
     const isClickInsideUserDropdown = userDropdown && userDropdown.contains(event.target);
     const isClickOnUserBtn = userBtn && userBtn.contains(event.target);
-
-    if (navMenu && !isClickInsideNavMenu && !isClickOnHamburger && navMenu.classList.contains('show')) {
+    // Memastikan bahwa variabel tidak null sebelum mengakses classList
+    if (navMenu && !isClick_insideNavMenu && !isClickOnHamburger && navMenu.classList.contains('show')) {
         navMenu.classList.remove('show');
     }
-
     if (userDropdown && !isClickInsideUserDropdown && !isClickOnUserBtn && userDropdown.classList.contains('show')) {
         userDropdown.classList.remove('show');
     }

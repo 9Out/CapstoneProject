@@ -711,7 +711,7 @@ body:not(.auth-login) {
 }
 
 .notification-options-group > label {
-    margin-bottom: 0.6rem_annotation: Menyesuaikan jarak bawah label grup opsi notifikasi untuk konsistensi visual;
+    margin-bottom: 0.6rem_annotation;
 }
 
 .notification-option {
@@ -1101,6 +1101,7 @@ body:not(.auth-login) {
     }
 
     .home-page-main {
+        max-width: fit-content;
         margin: 10px;
         padding: 10px;
         min-height: 300px;
@@ -1125,6 +1126,7 @@ body:not(.auth-login) {
     }
 
     .home-page-main {
+        max-width: fit-content;
         margin: 8px;
         padding: 10px;
     }
