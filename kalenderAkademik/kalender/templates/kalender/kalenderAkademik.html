@@ -19,10 +19,8 @@
         <div class="kalender-agenda-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h2>Agenda Akademik</h2>
-                {% if user.is_authenticated %}
-                {% if perms.kalender.add_kegiatan %}
+                 {% if perms.kalender.add_kegiatan %}
                 <button onclick="openModal()" class="kalender-btn-add">Tambah</button>
-                {% endif %}
                 {% endif %}
             </div>
 
@@ -158,7 +156,11 @@
 
 <script>
     // Variabel Global dan Inisiasi Elemen DOM
-
+    /** Elemen untuk menyimpan permission dari django */
+    const USER_CAN_CHANGE_KEGIATAN = {% if perms.kalender.change_kegiatan %}true{% else %}false{% endif %};
+    const USER_CAN_DELETE_KEGIATAN = {% if perms.kalender.delete_kegiatan %}true{% else %}false{% endif %};
+    const USER_CAN_ADD_NOTIFIKASI = {% if perms.kalender.add_notifikasi %}true{% else %}false{% endif %};
+    
     // Elemen DOM untuk Kalender dan Agenda
     /** Elemen untuk kalender dan daftar agenda */
     const calendarEl = document.getElementById('calendar');
@@ -407,20 +409,29 @@
                 <img src="https://img.icons8.com/?size=100&id=WKF3bm1munsk&format=png&color=000000" alt="Google Calendar">
             </button>
         `;
-            if ('{{ user.is_authenticated }}' === 'True' && !agenda.isHoliday) {
+            if (USER_CAN_ADD_NOTIFIKASI * !agenda.isHoliday) {
                 bellButtonHTML = `
                 <button class="kalender-btn-bell-icon" title="Setel Notifikasi" onclick="showNotificationPopup('${agenda.title.replace(/'/g, "\\'")}', '${agenda.start}', ${agenda.id})">
                     <i class="fa-regular fa-bell"></i>
                 </button>`;
                 if (currentUserId && agenda.user_fk === currentUserId) {
+                    // Tombol Edit berdasarkan izin 'change_kegiatan'
+                    if (USER_CAN_CHANGE_KEGIATAN) {
                     actionButtonsHTML += `
                     <button class="kalender-action-btn edit" title="Edit Kegiatan" onclick="openEditModal(${agenda.id}, '${agenda.title.replace(/'/g, "\\'")}', '${agenda.start}', '${agenda.end || ''}', ${agenda.kategori_id}, '${agenda.deskripsi ? agenda.deskripsi.replace(/'/g, "\\'") : ''}')">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
+                    `;
+                }
+
+                // Tombol Delete berdasarkan izin 'delete_kegiatan'
+                if (USER_CAN_DELETE_KEGIATAN) {
+                    actionButtonsHTML += `
                     <button class="kalender-action-btn delete" title="Hapus Kegiatan" onclick="openDeleteConfirmModal(${agenda.id}, '${agenda.title.replace(/'/g, "\\'")}')">
                         <i class="fas fa-trash-alt"></i>
                     </button>
-                `;
+                    `;
+                };
                 }
             }
             agendaEl.innerHTML = `

@@ -34,9 +34,8 @@
   pip install requests
   pip install celery[redis]
   pip install pytz
+  pip install django-jazzmin
   pip install mysqlclient  # Opsional, jika menggunakan MySQL
-  pip install django-jazzmin # Style custom panel admin
-  python manage.py populate_kalender
   ```
 
 ### 4. Instal Redis dan Node.js
@@ -84,17 +83,30 @@
   python manage.py migrate
   ```
 
+- Buat admin dengan kode berikut:
+  ```bash
+  python manage.py createsuperuser
+  python manage.py populate_kalender //Opsional isi database otomatis periode 2023/2024-2024/2025
+  ```
+
 ### 7. Jalankan Komponen Proyek
 - Pastikan semua komponen berjalan di terminal terpisah dan mengaktifkan virtual(ENV/env):
-  1. **Cek Redis apakah berjalan:**
+  1. **Jalankan Server Django:**
+     - Buka terminal baru di direktori root proyek (`KalenderAkademik-capstone/kalenderAkademik`):
+       ```bash
+       python manage.py runserver
+       ```
+       Cek localhost di browser http://localhost:8000/
+  2. **Cek Redis apakah berjalan:**
      - Cek service:
        ```bash
        WIN + R
        Input: services.msc
        Cari name redist, pastikan status running
        ```
-  2. **Jalankan Celery Beat dan Worker:**
+  3. **Jalankan Celery Beat dan Worker:**
      - Buka dua terminal baru di direktori root proyek (`KalenderAkademik-capstone/kalenderAkademik`):
+       - Semua terminal harus mengaktifkan env(env\scripts\activate)
        - Terminal 1 (Celery Beat):
          ```bash
          celery -A kalenderAkademik beat --loglevel=info
@@ -103,11 +115,7 @@
          ```bash
          celery -A kalenderAkademik worker --loglevel=info --pool=threads
          ```
-  3. **Jalankan Server Django:**
-     - Buka terminal baru di direktori root proyek (`KalenderAkademik-capstone/kalenderAkademik`):
-       ```bash
-       python manage.py runserver
-       ```
+
   4. **Jalankan Server WhatsApp (Node.js):**
      - Buka terminal baru, masuk ke direktori `whatsapp-server`:
        ```bash

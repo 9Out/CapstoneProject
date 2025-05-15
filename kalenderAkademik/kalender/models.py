@@ -158,7 +158,7 @@ class TahunAkademik(models.Model):
         return self.tahun_akademik
 
 class Kategori(models.Model):
-    nama = models.CharField(max_length=25)
+    nama = models.CharField(max_length=50)
     warna = models.CharField(unique=True,
         max_length=7,  
         choices = COLOR_CHOICES,

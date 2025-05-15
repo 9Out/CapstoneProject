@@ -1225,9 +1225,13 @@ body:not(.auth-login) {
         font-size: 1em !important;
         margin: 0.1em 0 !important;
     }
+    .fc-header-toolbar .fc-button {
+        width: fit-content !important;
+        padding: 0.3em 0.4em !important;
+}
 
     .fc-toolbar-title {
-        font-size: 1.4rem !important;
+        font-size: 1.3rem !important;
     }
 
     .custom-alert-bar {
