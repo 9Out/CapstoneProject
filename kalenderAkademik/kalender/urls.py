@@ -1,9 +1,13 @@
-from django.urls import include, path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import KegiatanViewSet
 
-# Pilih salah satu nama app yang sesuai kebutuhan
-app_name = 'kalender'  # atau 'kalenderPage', sesuaikan dengan views dan struktur project
+app_name = 'kalender'
+
+router = DefaultRouter()
+router.register(r'kegiatan', KegiatanViewSet)
 
 urlpatterns = [
-    path('', views.kalender, name='kaldik'),
+    path('api/', include(router.urls)),         # endpoint REST API
+    path('', kalender, name='kaldik'),          # endpoint HTML biasa
 ]
