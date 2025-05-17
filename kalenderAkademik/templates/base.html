@@ -34,8 +34,8 @@
                 <li><a href="{% url 'home:home' %}"
                         class="nav-link {% if request.resolver_match.view_name == 'home:home' %}active{% endif %}">Beranda</a>
                 </li>
-                <li><a href="{% url 'kalenderPage:kaldik' %}"
-                        class="nav-link {% if request.resolver_match.view_name == 'kalenderPage:kaldik' %}active{% endif %}">Kalender
+                <li><a href="{% url 'kalender:kaldik' %}"
+                        class="nav-link {% if request.resolver_match.view_name == 'kalender:kaldik' %}active{% endif %}">Kalender
                         Akademik</a></li>
                 <li><a href="{% url 'about' %}"
                         class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">Tentang</a>

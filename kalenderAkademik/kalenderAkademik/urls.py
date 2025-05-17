@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from kalender.views import KegiatanListView, save_notification, category_list, add_kegiatan, delete_kegiatan, update_kegiatan
+from kalender.views import (KegiatanListView, add_kegiatan, category_list,
+                            delete_kegiatan, save_notification,
+                            update_kegiatan)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,7 +26,6 @@ urlpatterns = [
     path('kalender/', include('kalender.urls')),
     path('about/', include('aboutUs.urls')),
     path('auth/', include('userAuth.urls')),
-    path('api/', include('kalender.api_urls')),
     path('api/events/', KegiatanListView.as_view(), name='kegiatan-list'),
     path('api/save-notification/', save_notification, name='save-notification'),
     path('api/categories/', category_list, name='category-list'),
