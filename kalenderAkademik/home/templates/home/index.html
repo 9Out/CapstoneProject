@@ -1,43 +1,39 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Portal Informasi Kalender Akademik UMS{% endblock %}
 
-{% block extra_head %}
-    <!-- <link rel="stylesheet" href="{% static 'home/css/styles-index.css' %}"> -->
-    <style>
-      body{
-        background-image: url("{% static 'assets/siwal.jpg'%}");
-      }
-    </style>
+{% block title %}
+Home
 {% endblock %}
 
-
 {% block content %}
-    <div class="judul">
-        <h1>Portal Informasi Kalender Akademik UMS</h1>
-        <p>Portal ini merupakan sistem informasi berbasis web yang menyediakan akses cepat dan terpusat terhadap seluruh jadwal akademik resmi Universitas Muhammadiyah Surakarta.</p>
+<!-- Komponen Utama Halaman Beranda -->
+<div class="home-page-container">
+    <!-- Header Beranda -->
+    <header class="home-page-header" style="background-image: url('{% static 'assets/siwal.jpg' %}');">
+        <div class="home-page-judul">
+            <h1>Portal Informasi Kalender Akademik UMS</h1>
+            <p>Portal ini merupakan sistem informasi berbasis web yang menyediakan akses cepat dan terpusat terhadap
+                seluruh jadwal akademik resmi Universitas Muhammadiyah Surakarta</p>
+        </div>
+    </header>
+    <!-- Konten Utama Beranda -->
+    <div class="home-page-main">
+        <!-- section Pengumuman -->
+        <div class="home-page-section announcement">
+            <h2><i class="fas fa-bullhorn section-icon"></i>Pengumuman</h2>
+            <ul id="pengumuman-list">
+                <li class="loading-data">Memuat pengumuman...</li>
+            </ul>
+        </div>
+        <!-- section Kegiatan -->
+        <div class="home-page-section events">
+            <h2><i class="fas fa-calendar-alt section-icon"></i>Kegiatan Terdekat</h2>
+            <ul id="kegiatan-list">
+                <li class="loading-data">Memuat kegiatan...</li>
+            </ul>
+        </div>
     </div>
-        
-    <main>
-        <!-- <h1>Portal Informasi Kalender Akademik UMS</h1>
-        <p>Portal ini merupakan sistem informasi berbasis web yang menyediakan akses cepat dan terpusat terhadap seluruh jadwal akademik resmi Universitas Muhammadiyah Surakarta.</p> -->
-        
-        <section class="announcement">
-          <h2>📢 Pengumuman:</h2>
-          <ul>
-            <li>- Perubahan jadwal UTS Fakultas Teknik dimulai 22 April 2025</li>
-            <li>- Batas akhir pengajuan cuti akademik: 20 April 2025</li>
-          </ul>
-        </section>
-    
-        <section class="events">
-          <h2>📅 Kegiatan Terdekat:</h2>
-          <ul>
-            <li>- Awal Perkuliahan Genap: 15 April 2025</li>
-            <li>- Batas Pengisian KRS: 25 April 2025</li>
-            <li>- Libur Nasional: 1 Mei 2025 (Hari Buruh)</li>
-          </ul>
-        </section>
-      </main>
-    <script src="script2.js"></script>
+</div>
+<!-- Skrip JavaScript -->
+<script src="{% static 'home/js/home.js' %}"></script>
 {% endblock %}

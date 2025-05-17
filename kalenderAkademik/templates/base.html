@@ -1,54 +1,97 @@
 {% load static %}
+
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %} {% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css'%}">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="icon" href="{% static 'assets/LOGO_HD.png' %}">
-     {% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% block extra_head %}
     {% endblock %}
 </head>
+
 <body>
-    <!-- navbar -->
+    {% if request.path != '/auth/login/' %}
+    <!-- Komponen Navbar -->
     <div class="navbar">
         <div class="logo-container">
             <a href="{% url 'home:home' %}">
-                <img src="{% static 'assets/logo.png'%}" alt="UMS Logo" class="logo">
+                <img src="{% static 'assets/logo.png' %}" alt="UMS Logo" class="logo">
                 <div class="university-text">
                     <span>UMS</span>
                     <span>Universitas Muhammadiyah Surakarta</span>
                 </div>
             </a>
         </div>
-        <div class="button-group">
-            <a href="{% url 'home:home' %}"><button>Beranda</button></a>
-            <a href="{% url 'kalender:kaldik' %}"><button>Kalender Akademik</button></a>
-            <a href="{% url 'about' %}"><button class="tentang">Tentang</button></a>
-            {% if user.is_authenticated %}
-            <form method="post" action="{% url 'userAuth:logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="user-btn"><img src="{% static 'assets/user.png'%}" alt="User Icon" class="user-icon"></button>
-            </form>
-            {% else %}
-            <a href="{% url 'userAuth:login'%}"><button class="user-btn"><img src="{% static 'assets/user.png'%}" alt="User Icon" class="user-icon"></button></a>
-            {% endif %}
+        <button class="hamburger" onclick="toggleMenu(event)">☰</button>
+        <div class="nav-right">
+            <ul class="nav-menu">
+                <li><a href="{% url 'home:home' %}"
+                        class="nav-link {% if request.resolver_match.view_name == 'home:home' %}active{% endif %}">Beranda</a>
+                </li>
+                <li><a href="{% url 'kalenderPage:kaldik' %}"
+                        class="nav-link {% if request.resolver_match.view_name == 'kalenderPage:kaldik' %}active{% endif %}">Kalender
+                        Akademik</a></li>
+                <li><a href="{% url 'about' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">Tentang</a>
+                </li>
+                <li class="auth-link mobile-only">
+                    {% if user.is_authenticated %}
+                    <span class="nav-link mobile-username">{{ user.username }}</span>
+                    <form method="post" action="{% url 'userAuth:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link">Logout</button>
+                    </form>
+                    {% else %}
+                    <a href="{% url 'userAuth:login' %}" class="nav-link">Login</a>
+                    {% endif %}
+                </li>
+            </ul>
+            <div class="user-menu desktop-only">
+                <button class="user-btn" onclick="toggleUserMenu(event)">
+                    <img src="{% static 'assets/user.png' %}" alt="User Icon" class="user-icon">
+                </button>
+                <ul class="user-dropdown">
+                    {% if user.is_authenticated %}
+                    <li>
+                        <span class="user-dropdown-info">{{ user.username }}</span>
+                    </li>
+                    <li>
+                        <form method="post" action="{% url 'userAuth:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="user-action">Logout</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li><a href="{% url 'userAuth:login' %}" class="user-action">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
-    <!-- endNavbar -->
+    {% endif %}
 
-     <!-- content -->
-      {% block content %}
-      {% endblock %}
-     <!-- endContent -->
+    <!-- Konten Utama -->
+    {% block content %}
+    {% endblock %}
 
-    <!-- footer -->
-<!--    <div style="background-color: #1e3a8a; color: white; text-align: center; padding: 10px 0; position: relative; bottom: 0; width: 100%;">-->
-<!--        <p id="footer_child">&copy; 2025 Universitas Muhammadiyah Surakarta</p>-->
-<!--        &lt;!&ndash; <p id="footer_child">Hidoep Joke Ouch Why</p> &ndash;&gt;-->
-<!--    </div>-->
-    <!-- endFooter -->
+    {% if request.path != '/auth/login/' %}
+    <!-- Komponen Footer -->
+    <div class="footer">
+        <p id="footer_child">© {% now "Y" %} Universitas Muhammadiyah Surakarta</p>
+    </div>
+    {% endif %}
 
-
+    <!-- Skrip JavaScript -->
+    <script src="{% static 'js/scripts.js' %}"></script>
+<script>
+  const currentUserName = '{{ user.username|default:"Tamu"|escapejs }}';
+</script>
 </body>
+
 </html>

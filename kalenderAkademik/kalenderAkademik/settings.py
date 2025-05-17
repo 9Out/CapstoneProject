@@ -25,12 +25,13 @@ SECRET_KEY = 'django-insecure-jdcn$2)4aplnya62(z*28=g+3)uoejy6dpw8rjse34!5y08ak9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +44,47 @@ INSTALLED_APPS = [
     'userAuth',
     'rest_framework',
 ]
+
+
+JAZZMIN_SETTINGS = {
+    "changeform_format": "default", 
+    "show_ui_builder": True,  
+    "site_logo": "assets/logo.png",
+    "site_title": "Administrator Kalender Akademik",
+    "site_header": "Kalender Akademik",
+    "icons": {
+        "auth": "fas fa-users-cog",           
+        "kalender": "fas fa-calendar-alt",    
+        "userauth": "fas fa-user",            
+        "auth.group": "fas fa-users",         
+        "kalender.kategori": "fas fa-tags",   
+        "kalender.kegiatan": "fas fa-tasks",  
+        "kalender.notifikasi": "fas fa-bell", 
+        "kalender.tahunakademik": "fas fa-graduation-cap",  
+        "userauth.customuser": "fas fa-user-circle",        
+    },
+}
+
+# JAZZMIN_SETTINGS = {
+#     # Judul situs di panel admin
+#     "site_title": "My Admin",
+#     # Logo situs
+#     "site_logo": "images/logo.png",
+#     # Tema (pilih dari bootswatch, misalnya 'cyborg', 'flatly', dll.)
+#     "theme": "cyborg",
+#     # Kustomisasi menu samping
+#     "navigation_expanded": True,
+#     # CSS kustom
+#     "custom_css": "css/custom.css",
+#     # JS kustom
+#     "custom_js": "js/custom.js",
+#     # Menyembunyikan aplikasi tertentu
+#     "hide_apps": ['auth'],
+#     # Menyembunyikan model tertentu
+#     "hide_models": ['auth.user'],
+#     # Mengaktifkan UI tweaker
+#     "show_ui_builder": True,
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -80,9 +122,23 @@ WSGI_APPLICATION = 'kalenderAkademik.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'kaldik',
+#         'USER':'root',
+#         'PASSWORD': '',
+#         'HOST':'localhost',
+#         'PORT':'',
+#         'OPTIONS':{
+#             'charset':'utf8mb4'
+#         }
+        
+#     }
+# }
 
 
 # Password validation
@@ -132,8 +188,37 @@ DATETIME_FORMAT = 'Y-m-d H:i'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR/'static']
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# EMAIL CONF
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'kalenderakademikums.project@gmail.com'  
+EMAIL_HOST_PASSWORD = 'vooi mima vxav znkt' 
+DEFAULT_FROM_EMAIL = 'kalenderakademikums.project@gmail.com'
+
+
+# CELERY CONF
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+
+# Celery Beat
+CELERY_BEAT_SCHEDULE = {
+    'check-notifications-every-minute': {
+        'task': 'kalender.tasks.check_notifications',
+        'schedule': 30.0,  
+    },
+}
