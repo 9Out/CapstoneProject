@@ -1,16 +1,16 @@
+from django.contrib.auth.models import User
+from django.db.models import Q
 from django.shortcuts import render
-from rest_framework import generics
-from .serializers import KegiatanSerializer, KategoriSerializer
-from rest_framework import status
-from rest_framework.response import Response
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Q
-from .models import Notifikasi, Kegiatan, Kategori, TahunAkademik
-from django.contrib.auth.models import User
-from django.utils.dateparse import parse_datetime
-from django.utils import timezone
+from rest_framework.response import Response
+
+from .models import Kategori, Kegiatan, Notifikasi, TahunAkademik
+from .serializers import KategoriSerializer, KegiatanSerializer
 
 
 @api_view(['GET'])
@@ -249,7 +249,6 @@ def delete_kegiatan(request, id):
     except Exception as e:
         return Response({'success': False, 'error': str(e)},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 def kalender(request):
     return render(request, 'kalender/kalenderAkademik.html', {
