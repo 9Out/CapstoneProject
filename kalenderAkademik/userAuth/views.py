@@ -3,10 +3,18 @@ from django.shortcuts import render, redirect
 from .forms import CustomAuthenticationForm
 from django.contrib.auth.views import LoginView
 
+
 class Custom_login(LoginView):
     template_name = 'userAuth/login.html'
     form_class = CustomAuthenticationForm
     redirect_authenticated_user = True
+    
+# def redirect_login(request):
+#     if request.user.is_staff or request.user.is_superuser:
+#         return redirect('home') 
+#     else:
+#         return redirect('login')  
+
 
 
 

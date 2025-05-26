@@ -19,7 +19,7 @@ from django.urls import include, path
 from kalender.views import KegiatanListView, save_notification, category_list, add_kegiatan, delete_kegiatan, update_kegiatan
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name='admin'),
     path('', include('home.urls')),
     path('kalender/', include('kalender.urls')),
     path('about/', include('aboutUs.urls')),

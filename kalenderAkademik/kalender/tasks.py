@@ -22,7 +22,7 @@ def format_no_telpon(no_telpon):
     return no_telpon
 
 @shared_task
-def send_email_notification(notifikasi_id):
+def send_email_notification(notifikasi_id, is_scheduled=False):
     try:
         notifikasi = Notifikasi.objects.get(id=notifikasi_id)
         if notifikasi.metode != 'email':
@@ -59,8 +59,9 @@ def send_email_notification(notifikasi_id):
         email.attach_alternative(html_content, "text/html")
         email.send()
 
-        notifikasi.status = 'Terkirim'
-        notifikasi.save()
+        if is_scheduled:
+            notifikasi.status = 'Terkirim'
+            notifikasi.save()
 
     except Exception as e:
         notifikasi.status = 'Gagal'
@@ -124,17 +125,17 @@ def check_notifications():
         # 1 hari sebelum (86400 detik)
         if 0 <= time_difference_seconds <= 86400 and not notifikasi.one_day_before:
             if notifikasi.metode == 'whatsapp':
-                send_whatsapp_notification.delay(notifikasi.id)
+                send_whatsapp_notification.delay(notifikasi.id, is_scheduled=True)
             elif notifikasi.metode == 'email':
-                send_email_notification.delay(notifikasi.id)
+                send_email_notification.delay(notifikasi.id, is_scheduled=True)
             notifikasi.one_day_before = True
             notifikasi.save()
 
         # 1 jam sebelum (3600 detik)
         if 0 <= time_difference_seconds <= 3600 and not notifikasi.one_hour_before:
             if notifikasi.metode == 'whatsapp':
-                send_whatsapp_notification.delay(notifikasi.id)
+                send_whatsapp_notification.delay(notifikasi.id, is_scheduled=True)
             elif notifikasi.metode == 'email':
-                send_email_notification.delay(notifikasi.id)
+                send_email_notification.delay(notifikasi.id, is_scheduled=True)
             notifikasi.one_hour_before = True
             notifikasi.save()

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'kalender',
     'userAuth',
     'rest_framework',
+    'ormawa',
 ]
 
 

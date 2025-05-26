@@ -8,9 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from .models import Notifikasi, Kegiatan, Kategori, TahunAkademik
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from .tasks import send_email_notification, send_whatsapp_notification
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 
@@ -21,9 +23,9 @@ def category_list(request):
     serializer = KategoriSerializer(categories, many=True)
     return Response(serializer.data)
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@csrf_exempt
 def add_kegiatan(request):
     try:
         data = request.data
@@ -32,7 +34,7 @@ def add_kegiatan(request):
         tgl_mulai = parse_datetime(data.get('start'))
         tgl_selesai = parse_datetime(data.get('end')) if data.get('end') else tgl_mulai
         kategori_id = data.get('kategori_id')
-        tahun_akademik_id = data.get('tahun_akademik_id')  
+        tahun_akademik_id = data.get('tahun_akademik_id')   
         semester = data.get('semester', 'Ganjil')  
 
         # Validasi input
@@ -56,8 +58,8 @@ def add_kegiatan(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Tentukan tahun akademik (contoh: ambil default atau dari input)
-        tahun_akademik = TahunAkademik.objects.first()  
+        # Tentukan tahun akademik
+        tahun_akademik = TahunAkademik.objects.first()   
         if tahun_akademik_id:
             try:
                 tahun_akademik = TahunAkademik.objects.get(id=tahun_akademik_id)
@@ -78,6 +80,18 @@ def add_kegiatan(request):
             user_fk=request.user,
             kategori_fk=kategori
         )
+        User = get_user_model()
+        users = User.objects.all()
+
+        # Buat notifikasi untuk semua user
+        for user in users:
+            notifikasi = Notifikasi.objects.create(
+                user_fk=user,
+                kegiatan_fk=kegiatan,
+                metode='email',   
+                status='Pending'
+            )
+            send_email_notification.delay(notifikasi.id)
 
         return Response(
             {'success': True, 'message': 'Kegiatan berhasil ditambahkan'},
@@ -99,6 +113,8 @@ def save_notification(request):
         data = request.data
         kegiatan_id = data.get('kegiatan_id')
         metode = data.get('metode')
+        one_day_before = data.get('one_day_before')
+        one_hour_before = data.get('one_hour_before')
 
         if not kegiatan_id or metode not in ['email', 'whatsapp']:
             return Response({'success': False, 'error': 'Kegiatan ID dan metode valid diperlukan'}, status=status.HTTP_400_BAD_REQUEST)
@@ -112,7 +128,9 @@ def save_notification(request):
                 user_fk=user,
                 kegiatan_fk=kegiatan,
                 metode=metode,
-                status='Pending'
+                status='Pending',
+                one_day_before=one_day_before,
+                one_hour_before=one_hour_before
             )
             return Response({'success': True, 'message': 'Notifikasi berhasil disimpan'})
         else:
@@ -130,11 +148,11 @@ class KegiatanListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Kegiatan.objects.all()
         search = self.request.query_params.get('search')
-        start_param = self.request.query_params.get('start') # Ubah nama variabel agar tidak konflik
-        end_param = self.request.query_params.get('end')     # Ubah nama variabel agar tidak konflik
+        start_param = self.request.query_params.get('start') 
+        end_param = self.request.query_params.get('end')     
         year_str = self.request.query_params.get('year')
         month_str = self.request.query_params.get('month')
-        academic_year_param = self.request.query_params.get('academic_year') # Ubah nama variabel
+        academic_year_param = self.request.query_params.get('academic_year') 
 
         if search:
             # Jika ada parameter search, cari kegiatan berdasarkan nama atau deskripsi
@@ -193,20 +211,10 @@ class KegiatanListView(generics.ListAPIView):
                         tgl_mulai__month=parsed_month
                     ).order_by('tgl_mulai')
                 else:
-                    # Default jika tidak ada parameter tahun/bulan yang valid:
-                    # Menampilkan kegiatan pada tahun saat ini atau bisa juga semua kegiatan
-                    # Untuk contoh ini, kita tampilkan semua kegiatan jika tidak ada filter spesifik
-                    # Atau, bisa juga default ke tahun akademik aktif atau tahun saat ini
-                    # current_year = timezone.now().year
-                    # queryset = queryset.filter(tgl_mulai__year=current_year).order_by('tgl_mulai')
-                    # Jika tidak ada filter tanggal/tahun/bulan/akademik yang spesifik,
-                    # mungkin lebih baik tidak memfilter berdasarkan tanggal sama sekali di blok ini,
-                    # atau sesuaikan dengan default yang diinginkan.
-                    # Untuk saat ini, jika tidak ada parameter di atas, queryset tidak difilter lebih lanjut di blok ini.
                     queryset = queryset.order_by('tgl_mulai')
 
 
-        return queryset.distinct() # Tambahkan distinct untuk menghindari duplikasi jika relasi kompleks
+        return queryset.distinct() # distinct untuk menghindari duplikasi jika relasi kompleks
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -243,13 +251,8 @@ def update_kegiatan(request, id):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        try:
-            kategori = Kategori.objects.get(id=kategori_id)
-        except Kategori.DoesNotExist:
-            return Response(
-                {'success': False, 'error': 'Kategori tidak ditemukan'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # Ambil kategori berdasarkan ID
+        kategori = Kategori.objects.get(id=kategori_id)
 
         # Update kegiatan
         kegiatan.nama = nama
@@ -258,9 +261,28 @@ def update_kegiatan(request, id):
         kegiatan.tgl_selesai = tgl_selesai
         kegiatan.kategori_fk = kategori
         kegiatan.save()
+        
+        User = get_user_model()   
+        users = User.objects.all()
+
+        # Buat atau perbarui notifikasi untuk semua user
+        for user in users:
+            notifikasi, created = Notifikasi.objects.get_or_create(
+                user_fk=user,
+                kegiatan_fk=kegiatan,
+                defaults={'status': 'Pending', 'metode': 'email', 'one_day_before': False, 'one_hour_before': False}   
+            )
+            # Jika notifikasi sudah ada, perbarui status dan flag
+            if not created:
+                notifikasi.status = 'Pending'
+                notifikasi.one_day_before = False
+                notifikasi.one_hour_before = False
+                notifikasi.save()
+            
+            send_email_notification.delay(notifikasi.id)
 
         return Response(
-            {'success': True, 'message': 'Kegiatan berhasil diperbarui'},
+            {'success': True, 'message': 'Kegiatan berhasil diperbarui dan notifikasi dikirimkan'},
             status=status.HTTP_200_OK
         )
 
@@ -274,7 +296,6 @@ def update_kegiatan(request, id):
             {'success': False, 'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
