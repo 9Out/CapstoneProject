@@ -32,7 +32,7 @@ def add_kegiatan(request):
         nama = data.get('nama')
         deskripsi = data.get('deskripsi', '')
         tgl_mulai = parse_datetime(data.get('start'))
-        tgl_selesai = parse_datetime(data.get('end')) if data.get('end') else tgl_mulai
+        tgl_selesai = parse_datetime(data.get('end')) if data.get('end') else tgl_mulai.replace(hour=23, minute=59, second=59)
         kategori_id = data.get('kategori_id')
         tahun_akademik_id = data.get('tahun_akademik_id')   
         semester = data.get('semester', 'Ganjil')  

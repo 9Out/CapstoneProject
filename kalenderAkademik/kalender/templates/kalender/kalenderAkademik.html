@@ -36,10 +36,12 @@
                             <div style="flex: 1; min-width: 120px;">
                                 <label for="eventStart">Tanggal Mulai</label>
                                 <input type="date" id="eventStart" name="start" required />
+                                <input type="time" id="eventStartTime" name="start_time" />
                             </div>
                             <div style="flex: 1; min-width: 120px;">
                                 <label for="eventEnd">Tanggal Selesai</label>
                                 <input type="date" id="eventEnd" name="end" />
+                                <input type="time" id="eventEndTime" name="end_time" />
                             </div>
                         </div>
 
@@ -690,40 +692,51 @@
         eventEnd.addEventListener('change', calculateDays);
         /** Menangani submit form tambah kegiatan */
         eventForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nama = document.getElementById('eventTitle').value.trim();
-            const start = document.getElementById('eventStart').value;
-            let end = document.getElementById('eventEnd').value;
-            const kategori_id = document.getElementById('eventCategory').value;
-            const deskripsi = document.getElementById('eventDescription').value.trim();
-            if (!nama || !start || !kategori_id) {
-                showCustomAlert('Nama kegiatan, tanggal mulai, dan kategori wajib diisi.', 'error');
-                return;
-            }
-            if (!end) end = start;
-            const startDate = new Date(start + 'T00:00:00+07:00');
-            const endDateForStorage = new Date(end + 'T23:59:58+07:00');
-            const newEvent = { nama, start: startDate.toISOString(), end: endDateForStorage.toISOString(), kategori_id, deskripsi };
-            try {
-                const response = await fetch('/api/events/add/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                    body: JSON.stringify(newEvent)
-                });
-                if (response.ok) {
-                    showCustomAlert('Kegiatan berhasil ditambahkan!', 'success');
-                    calendar.refetchEvents();
-                    filterAgenda();
-                    closeModal();
-                } else {
-                    const errorData = await response.json();
-                    showCustomAlert('Gagal menambahkan kegiatan: ' + (errorData.error || JSON.stringify(errorData)), 'error');
-                }
-            } catch (err) {
-                console.error('Error saat submit event:', err);
-                showCustomAlert('Terjadi kesalahan koneksi saat menambahkan kegiatan.', 'error');
-            }
+    e.preventDefault();
+
+    const nama = document.getElementById('eventTitle').value.trim();
+    const start = document.getElementById('eventStart').value;
+    let end = document.getElementById('eventEnd').value;
+    const startTime = document.getElementById('eventStartTime').value || '00:00';
+    const endTime = document.getElementById('eventEndTime').value || '23:59';
+    const kategori_id = document.getElementById('eventCategory').value;
+    const deskripsi = document.getElementById('eventDescription').value.trim();
+
+    if (!nama || !start || !kategori_id) {
+        showCustomAlert('Nama kegiatan, tanggal mulai, dan kategori wajib diisi.', 'error');
+        return;
+    }
+
+    // Jika tanggal selesai tidak diisi, setel sama dengan tanggal mulai
+    if (!end) end = start;
+
+    const startDate = new Date(`${start}T${startTime}:00+07:00`);
+    const endDate = new Date(`${end}T${endTime}:00+07:00`);
+
+    // Kirimkan data ke server
+    const newEvent = { nama, start: startDate.toISOString(), end: endDate.toISOString(), kategori_id, deskripsi };
+
+    try {
+        const response = await fetch('/api/events/add/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify(newEvent)
         });
+
+        if (response.ok) {
+            showCustomAlert('Kegiatan berhasil ditambahkan!', 'success');
+            calendar.refetchEvents();
+            filterAgenda();
+            closeModal();
+        } else {
+            const errorData = await response.json();
+            showCustomAlert('Gagal menambahkan kegiatan: ' + (errorData.error || JSON.stringify(errorData)), 'error');
+        }
+    } catch (err) {
+        console.error('Error saat submit event:', err);
+        showCustomAlert('Terjadi kesalahan koneksi saat menambahkan kegiatan.', 'error');
+    }
+});
 
         // Event listener untuk modal edit kegiatan
         if (closeEditEventModalBtn) closeEditEventModalBtn.addEventListener('click', closeEditModal);
