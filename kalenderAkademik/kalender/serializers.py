@@ -29,8 +29,8 @@ class KegiatanSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         kategori = instance.kategori_fk
         # Konversi ke WIB dan ambil tanggal
-        start_date = timezone.localtime(instance.tgl_mulai, timezone.get_fixed_timezone(420)).date() if instance.tgl_mulai else None
-        end_date = timezone.localtime(instance.tgl_selesai, timezone.get_fixed_timezone(420)).date() if instance.tgl_selesai else None
+        start_date = timezone.localtime(instance.tgl_mulai, timezone.get_fixed_timezone(420)) if instance.tgl_mulai else None
+        end_date = timezone.localtime(instance.tgl_selesai, timezone.get_fixed_timezone(420)) if instance.tgl_selesai else None
         if end_date:
             end_date += timedelta(days=1)  # Penyesuaian untuk FullCalendar (end date eksklusif)
         return {

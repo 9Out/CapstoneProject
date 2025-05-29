@@ -169,18 +169,34 @@ class Kategori(models.Model):
 
 class Kegiatan(models.Model):
     tahun_akademik = models.ForeignKey(TahunAkademik, on_delete=models.CASCADE)
-    semester = models.CharField(choices=[('Ganjil','Ganjil'),('Genap','Genap')], max_length=20, default='Ganjil')
+    semester = models.CharField(choices=[('Ganjil','Ganjil'),('Genap','Genap')], max_length=20)
     nama = models.CharField(max_length=50)
     deskripsi = models.TextField(max_length=254, blank=True, null=True)
     tgl_mulai = models.DateTimeField()
     tgl_selesai = models.DateTimeField()
     user_fk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     kategori_fk = models.ForeignKey(Kategori, on_delete=models.CASCADE)
+    is_deleted = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    # updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.nama
+    
+    @property
+    def semester_aktivitas(self):
+        bulan_mulai = self.tgl_mulai.month
+        if 2 <= bulan_mulai <= 7:
+            return 'Genap'
+        else:
+            return 'Ganjil'
+        
+    def save(self, *args, **kwargs):
+        self.semester = self.semester_aktivitas
+        super(Kegiatan, self).save(*args, **kwargs)
+    
+    
 
 class Notifikasi(models.Model):
     user_fk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

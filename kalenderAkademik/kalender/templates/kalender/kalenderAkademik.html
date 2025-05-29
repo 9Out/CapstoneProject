@@ -36,16 +36,25 @@
                             <div style="flex: 1; min-width: 120px;">
                                 <label for="eventStart">Tanggal Mulai</label>
                                 <input type="date" id="eventStart" name="start" required />
+                            </div>
+                            <div style="flex: 1; min-width: 120px;">
+                                <label for="eventEnd">Tanggal Selesai (opsional)</label>
+                                <input type="date" id="eventEnd" name="end" />
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 120px;">
+                                <label for="eventStartTime">Waktu Mulai (opsional)</label>
                                 <input type="time" id="eventStartTime" name="start_time" />
                             </div>
                             <div style="flex: 1; min-width: 120px;">
-                                <label for="eventEnd">Tanggal Selesai</label>
-                                <input type="date" id="eventEnd" name="end" />
+                                <label for="eventEndTime">Waktu Selesai (opsional)</label>
                                 <input type="time" id="eventEndTime" name="end_time" />
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 120px;">
                                 <label for="eventDays">Jumlah Hari</label>
                                 <input type="text" id="eventDays" readonly />
@@ -85,6 +94,16 @@
                                 <input type="date" id="editEventEnd" name="end" />
                             </div>
                         </div>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+    <div style="flex: 1; min-width: 120px;">
+        <label for="editEventStartTime">Waktu Mulai (opsional)</label>
+        <input type="time" id="editEventStartTime" name="start_time" />
+    </div>
+    <div style="flex: 1; min-width: 120px;">
+        <label for="editEventEndTime">Waktu Selesai (opsional)</label>
+        <input type="time" id="editEventEndTime" name="end_time" />
+    </div>
+</div>
 
                         <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
                             <div style="flex: 1; min-width: 120px;">
@@ -186,6 +205,8 @@
 
     // Elemen DOM untuk Modal Edit Kegiatan
     /** Elemen untuk modal dan form edit kegiatan */
+    const editEventStartTime = document.getElementById('editEventStartTime');
+    const editEventEndTime = document.getElementById('editEventEndTime');
     const editModal = document.getElementById('editEventModal');
     const editEventForm = document.getElementById('editEventForm');
     const editEventId = document.getElementById('editEventId');
@@ -363,84 +384,88 @@
 
     /** Menampilkan daftar agenda ke dalam UI */
     function renderAgenda(agendaList) {
-        const currentUserId = {{ user_id|default:'null' }};
-        agendaContainer.innerHTML = '';
-        const filteredAgendaList = agendaList.filter(agenda =>
-            !agenda.kategori || agenda.kategori.toLowerCase() !== KATEGORI_PENGUMUMAN_LOWERCASE
-        );
-        if (filteredAgendaList.length === 0) {
-            agendaContainer.innerHTML = '<p>Tidak ada agenda kegiatan yang sesuai dengan periode atau pencarian ini.</p>';
-            return;
-        }
-        filteredAgendaList.forEach(agenda => {
-            const startDate = new Date(agenda.start);
-            let endDate = agenda.end && !agenda.isHoliday ? new Date(agenda.end) : null;
-            const formatTanggal = (date) => date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-            const formatTanggalTanpaTahun = (date) => date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' });
-            let tanggalText = '';
-            if (!endDate || startDate.getTime() >= new Date(endDate).getTime()) {
+    const currentUserId = {{ user_id|default:'null' }};
+    agendaContainer.innerHTML = '';
+    const filteredAgendaList = agendaList.filter(agenda =>
+        !agenda.kategori || agenda.kategori.toLowerCase() !== KATEGORI_PENGUMUMAN_LOWERCASE
+    );
+    if (filteredAgendaList.length === 0) {
+        agendaContainer.innerHTML = '<p>Tidak ada agenda kegiatan yang sesuai dengan periode atau pencarian ini.</p>';
+        return;
+    }
+    filteredAgendaList.forEach(agenda => {
+        const startDate = new Date(agenda.start);
+        let endDate = agenda.end && !agenda.isHoliday ? new Date(agenda.end) : null;
+        const formatTanggal = (date) => date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        const formatTanggalTanpaTahun = (date) => date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' });
+        const formatWaktu = (date) => date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); // Format HH:mm
+        let tanggalText = '';
+        let waktuText = '';
+        if (!endDate || startDate.getTime() >= new Date(endDate).getTime()) {
+            tanggalText = formatTanggal(startDate);
+            waktuText = `Waktu: ${formatWaktu(startDate)}`; // Hanya waktu mulai jika tidak ada endDate
+        } else {
+            const displayEndDate = new Date(endDate);
+            displayEndDate.setDate(displayEndDate.getDate() - 1); // Kurangi 1 hari karena end date eksklusif
+            if (startDate.toDateString() === displayEndDate.toDateString()) {
                 tanggalText = formatTanggal(startDate);
+                waktuText = `Waktu: ${formatWaktu(startDate)} - ${formatWaktu(endDate)}`; // Tampilkan rentang waktu
+            } else if (displayEndDate < startDate) {
+                tanggalText = formatTanggal(startDate);
+                waktuText = `Waktu: ${formatWaktu(startDate)}`;
             } else {
-                const displayEndDate = new Date(endDate);
-                displayEndDate.setDate(displayEndDate.getDate() - 1);
-                if (startDate.toDateString() === displayEndDate.toDateString()) {
-                    tanggalText = formatTanggal(startDate);
-                } else if (displayEndDate < startDate) {
-                    tanggalText = formatTanggal(startDate);
+                const startTahun = startDate.getFullYear();
+                const endTahun = displayEndDate.getFullYear();
+                const startBulan = startDate.getMonth();
+                const endBulan = displayEndDate.getMonth();
+                if (startTahun !== endTahun) {
+                    tanggalText = `${formatTanggal(startDate)} - ${formatTanggal(displayEndDate)}`;
+                } else if (startBulan !== endBulan) {
+                    tanggalText = `${formatTanggalTanpaTahun(startDate)} - ${formatTanggal(displayEndDate)}`;
                 } else {
-                    const startTahun = startDate.getFullYear();
-                    const endTahun = displayEndDate.getFullYear();
-                    const startBulan = startDate.getMonth();
-                    const endBulan = displayEndDate.getMonth();
-                    if (startTahun !== endTahun) {
-                        tanggalText = `${formatTanggal(startDate)} - ${formatTanggal(displayEndDate)}`;
-                    } else if (startBulan !== endBulan) {
-                        tanggalText = `${formatTanggalTanpaTahun(startDate)} - ${formatTanggal(displayEndDate)}`;
-                    } else {
-                        tanggalText = `${startDate.getDate()} - ${displayEndDate.getDate()} ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`;
-                    }
+                    tanggalText = `${startDate.getDate()} - ${displayEndDate.getDate()} ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`;
                 }
+                waktuText = `Waktu: ${formatWaktu(startDate)} - ${formatWaktu(endDate)}`; // Tampilkan rentang waktu
             }
-            
-            const agendaEl = document.createElement('div');
-            agendaEl.className = 'kalender-agenda-item';
-            agendaEl.style.borderLeftColor = agenda.backgroundColor || '#ff0000';
-            let bellButtonHTML = '';
-            let actionButtonsHTML = `
+        }
+
+        const agendaEl = document.createElement('div');
+        agendaEl.className = 'kalender-agenda-item';
+        agendaEl.style.borderLeftColor = agenda.backgroundColor || '#ff0000';
+        let bellButtonHTML = '';
+        let actionButtonsHTML = `
             <button class="kalender-action-btn gcal" title="Tambahkan ke Google Calendar" onclick="addToGoogleCalendar('${agenda.title.replace(/'/g, "\\'")}', '${agenda.start}', '${agenda.end || agenda.start}')">
                 <img src="https://img.icons8.com/?size=100&id=WKF3bm1munsk&format=png&color=000000" alt="Google Calendar">
             </button>
         `;
-            if (USER_CAN_ADD_NOTIFIKASI * !agenda.isHoliday) {
-                bellButtonHTML = `
+        if (USER_CAN_ADD_NOTIFIKASI && !agenda.isHoliday) {
+            bellButtonHTML = `
                 <button class="kalender-btn-bell-icon" title="Setel Notifikasi" onclick="showNotificationPopup('${agenda.title.replace(/'/g, "\\'")}', '${agenda.start}', ${agenda.id})">
                     <i class="fa-regular fa-bell"></i>
                 </button>`;
-                if (currentUserId && agenda.user_fk === currentUserId) {
-                    // Tombol Edit berdasarkan izin 'change_kegiatan'
-                    if (USER_CAN_CHANGE_KEGIATAN) {
+            if (currentUserId && agenda.user_fk === currentUserId) {
+                if (USER_CAN_CHANGE_KEGIATAN) {
                     actionButtonsHTML += `
-                    <button class="kalender-action-btn edit" title="Edit Kegiatan" onclick="openEditModal(${agenda.id}, '${agenda.title.replace(/'/g, "\\'")}', '${agenda.start}', '${agenda.end || ''}', ${agenda.kategori_id}, '${agenda.deskripsi ? agenda.deskripsi.replace(/'/g, "\\'") : ''}')">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
+                        <button class="kalender-action-btn edit" title="Edit Kegiatan" onclick="openEditModal(${agenda.id}, '${agenda.title.replace(/'/g, "\\'")}', '${agenda.start}', '${agenda.end || ''}', ${agenda.kategori_id}, '${agenda.deskripsi ? agenda.deskripsi.replace(/'/g, "\\'") : ''}')">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
                     `;
                 }
-
-                // Tombol Delete berdasarkan izin 'delete_kegiatan'
                 if (USER_CAN_DELETE_KEGIATAN) {
                     actionButtonsHTML += `
-                    <button class="kalender-action-btn delete" title="Hapus Kegiatan" onclick="openDeleteConfirmModal(${agenda.id}, '${agenda.title.replace(/'/g, "\\'")}')">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+                        <button class="kalender-action-btn delete" title="Hapus Kegiatan" onclick="openDeleteConfirmModal(${agenda.id}, '${agenda.title.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     `;
-                };
                 }
             }
-            agendaEl.innerHTML = `
+        }
+        agendaEl.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                     <div class="kalender-agenda-item-title">${agenda.title}</div>
                     <div class="kalender-agenda-date">Tanggal: ${tanggalText}</div>
+                    <div class="kalender-agenda-date">${waktuText}</div>
                     ${agenda.deskripsi ? `<div class="kalender-agenda-location">Deskripsi: ${agenda.deskripsi}</div>` : ''}
                 </div>
                 ${bellButtonHTML}
@@ -449,9 +474,9 @@
                 ${actionButtonsHTML}
             </div>
         `;
-            agendaContainer.appendChild(agendaEl);
-        });
-    }
+        agendaContainer.appendChild(agendaEl);
+    });
+}
 
     /** Membuka modal untuk menambah kegiatan baru */
     window.openModal = function () {
@@ -468,33 +493,41 @@
 
     /** Membuka modal edit kegiatan dengan data yang diisi */
     window.openEditModal = function (id, title, start, end, kategoriId, deskripsi) {
-        editEventId.value = id;
-        editEventTitle.value = title || '';
-        const startDate = new Date(start);
-        if (!isNaN(startDate)) {
-            editEventStart.value = startDate.toISOString().split('T')[0];
-        } else {
-            editEventStart.value = '';
-        }
-        if (end) {
-            const exclusiveEndDate = new Date(end);
-            const inclusiveEndDateForModal = new Date(exclusiveEndDate.valueOf());
-            inclusiveEndDateForModal.setDate(exclusiveEndDate.getDate() - 1);
-            if (!isNaN(inclusiveEndDateForModal)) {
-                editEventEnd.value = inclusiveEndDateForModal.toISOString().split('T')[0];
-            } else {
-                editEventEnd.value = '';
-            }
-        } else {
-            editEventEnd.value = editEventStart.value || '';
-        }
-        editEventDescription.value = deskripsi || '';
-        calculateEditDays();
-        loadCategories(editEventCategory).then(() => {
-            editEventCategory.value = kategoriId || '';
-        });
-        editModal.classList.add('show');
+    editEventId.value = id;
+    editEventTitle.value = title || '';
+    const startDate = new Date(start);
+    if (!isNaN(startDate)) {
+        editEventStart.value = startDate.toISOString().split('T')[0]; // Ambil tanggal (YYYY-MM-DD)
+        const startTime = startDate.toTimeString().split(' ')[0].slice(0, 5); // Ambil waktu (HH:mm)
+        editEventStartTime.value = startTime; // Isi waktu mulai asli
+    } else {
+        editEventStart.value = '';
+        editEventStartTime.value = '';
     }
+    if (end) {
+        const endDate = new Date(end);
+        if (!isNaN(endDate)) {
+            // Kurangi 1 hari untuk end date (karena FullCalendar end date eksklusif)
+            const inclusiveEndDate = new Date(endDate.getTime());
+            inclusiveEndDate.setDate(endDate.getDate() - 1);
+            editEventEnd.value = inclusiveEndDate.toISOString().split('T')[0]; // Ambil tanggal (YYYY-MM-DD)
+            const endTime = endDate.toTimeString().split(' ')[0].slice(0, 5); // Ambil waktu (HH:mm)
+            editEventEndTime.value = endTime; // Isi waktu selesai asli
+        } else {
+            editEventEnd.value = '';
+            editEventEndTime.value = '';
+        }
+    } else {
+        editEventEnd.value = editEventStart.value || '';
+        editEventEndTime.value = '';
+    }
+    editEventDescription.value = deskripsi || '';
+    calculateEditDays();
+    loadCategories(editEventCategory).then(() => {
+        editEventCategory.value = kategoriId || '';
+    });
+    editModal.classList.add('show');
+};
 
     /** Menutup modal edit kegiatan */
     function closeEditModal() {
@@ -641,6 +674,7 @@
             },
             height: 'auto',
             fixedWeekCount: false,
+            displayEventTime: false,
             /** Memuat agenda saat rentang tanggal berubah */
             datesSet: function (info) {
                 if (!document.getElementById('search').value) {
@@ -745,42 +779,47 @@
         editEventEnd.addEventListener('change', calculateEditDays);
         /** Menangani submit form edit kegiatan */
         editEventForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = editEventId.value;
-            const nama = editEventTitle.value.trim();
-            const start = editEventStart.value;
-            let end = editEventEnd.value;
-            const kategori_id = editEventCategory.value;
-            const deskripsi = editEventDescription.value.trim();
-            if (!nama || !start || !kategori_id) {
-                showCustomAlert('Nama kegiatan, tanggal mulai, dan kategori wajib diisi.', 'error');
-                return;
-            }
-            if (!end) end = start;
-            const startDate = new Date(start + 'T00:00:00+07:00');
-            const endDateForStorage = new Date(end + 'T23:59:58+07:00');
-            const updatedEvent = { nama, start: startDate.toISOString(), end: endDateForStorage.toISOString(), kategori_id, deskripsi };
-            try {
-                const response = await fetch(`/api/events/update/${id}/`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                    body: JSON.stringify(updatedEvent)
-                });
-                if (response.ok) {
-                    showCustomAlert('Kegiatan berhasil diperbarui!', 'success');
-                    calendar.refetchEvents();
-                    filterAgenda();
-                    closeEditModal();
-                } else {
-                    const errorData = await response.json();
-                    showCustomAlert('Gagal memperbarui kegiatan: ' + (errorData.error || JSON.stringify(errorData)), 'error');
-                }
-            } catch (err) {
-                console.error('Error saat update event:', err);
-                showCustomAlert('Terjadi kesalahan koneksi saat memperbarui kegiatan.', 'error');
-            }
+    e.preventDefault();
+    const id = editEventId.value;
+    const nama = editEventTitle.value.trim();
+    const start = editEventStart.value;
+    let end = editEventEnd.value;
+    const startTime = editEventStartTime.value || '00:00';
+    const endTime = editEventEndTime.value || '23:59';
+    const kategori_id = editEventCategory.value;
+    const deskripsi = editEventDescription.value.trim();
+    if (!nama || !start || !kategori_id) {
+        showCustomAlert('Nama kegiatan, tanggal mulai, dan kategori wajib diisi.', 'error');
+        return;
+    }
+    if (!end) end = start;
+    const startDate = new Date(`${start}T${startTime}:00+07:00`);
+    const endDate = new Date(`${end}T${endTime}:00+07:00`);
+    if (endDate < startDate) {
+        showCustomAlert('Waktu selesai tidak boleh sebelum waktu mulai.', 'error');
+        return;
+    }
+    const updatedEvent = { nama, start: startDate.toISOString(), end: endDate.toISOString(), kategori_id, deskripsi };
+    try {
+        const response = await fetch(`/api/events/update/${id}/`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify(updatedEvent)
         });
-
+        if (response.ok) {
+            showCustomAlert('Kegiatan berhasil diperbarui!', 'success');
+            calendar.refetchEvents();
+            filterAgenda();
+            closeEditModal();
+        } else {
+            const errorData = await response.json();
+            showCustomAlert('Gagal memperbarui kegiatan: ' + (errorData.error || JSON.stringify(errorData)), 'error');
+        }
+    } catch (err) {
+        console.error('Error saat update event:', err);
+        showCustomAlert('Terjadi kesalahan koneksi saat memperbarui kegiatan.', 'error');
+    }
+});
         // Event listener untuk modal konfirmasi hapus
         if (closeDeleteConfirmModalBtn) closeDeleteConfirmModalBtn.addEventListener('click', closeDeleteConfirmModal);
         if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', closeDeleteConfirmModal);

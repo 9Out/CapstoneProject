@@ -113,8 +113,8 @@ def save_notification(request):
         data = request.data
         kegiatan_id = data.get('kegiatan_id')
         metode = data.get('metode')
-        one_day_before = data.get('one_day_before')
-        one_hour_before = data.get('one_hour_before')
+        one_day_before = data.get('one_day_before', False)
+        one_hour_before = data.get('one_hour_before', False)
 
         if not kegiatan_id or metode not in ['email', 'whatsapp']:
             return Response({'success': False, 'error': 'Kegiatan ID dan metode valid diperlukan'}, status=status.HTTP_400_BAD_REQUEST)
@@ -122,31 +122,38 @@ def save_notification(request):
         kegiatan = Kegiatan.objects.get(id=kegiatan_id)
         user = request.user  # Ambil user yang login
 
-        # Cek apakah notifikasi sudah ada untuk user dan kegiatan ini
-        if not Notifikasi.objects.filter(user_fk=user, kegiatan_fk=kegiatan).exists():
-            Notifikasi.objects.create(
-                user_fk=user,
-                kegiatan_fk=kegiatan,
-                metode=metode,
-                status='Pending',
-                one_day_before=one_day_before,
-                one_hour_before=one_hour_before
-            )
-            return Response({'success': True, 'message': 'Notifikasi berhasil disimpan'})
-        else:
-            return Response({'success': False, 'error': 'Notifikasi sudah ada untuk agenda ini'}, status=status.HTTP_400_BAD_REQUEST)
+        # Cek apakah notifikasi sudah ada untuk user dan kegiatan ini dengan metode yang sama
+        existing_notification = Notifikasi.objects.filter(
+            user_fk=user,
+            kegiatan_fk=kegiatan,
+            metode=metode
+        ).first()
+
+        if existing_notification:
+            return Response({'success': False, 'error': f'Notifikasi dengan metode {metode} sudah ada untuk agenda ini'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Jika tidak ada notifikasi dengan metode yang sama, buat notifikasi baru
+        Notifikasi.objects.create(
+            user_fk=user,
+            kegiatan_fk=kegiatan,
+            metode=metode,
+            status='Pending',
+            one_day_before=one_day_before,
+            one_hour_before=one_hour_before
+        )
+
+        return Response({'success': True, 'message': f'Notifikasi dengan metode {metode} berhasil disimpan'})
 
     except Kegiatan.DoesNotExist:
         return Response({'success': False, 'error': 'Kegiatan tidak ditemukan'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class KegiatanListView(generics.ListAPIView):
     serializer_class = KegiatanSerializer
 
     def get_queryset(self):
-        queryset = Kegiatan.objects.all()
+        queryset = Kegiatan.objects.filter(is_deleted=False)
         search = self.request.query_params.get('search')
         start_param = self.request.query_params.get('start') 
         end_param = self.request.query_params.get('end')     
@@ -235,7 +242,7 @@ def update_kegiatan(request, id):
         nama = data.get('nama')
         deskripsi = data.get('deskripsi', '')
         tgl_mulai = parse_datetime(data.get('start'))
-        tgl_selesai = parse_datetime(data.get('end')) if data.get('end') else tgl_mulai
+        tgl_selesai = parse_datetime(data.get('end')) if data.get('end') else tgl_mulai.replace(hour=23, minute=59, second=59)
         kategori_id = data.get('kategori_id')
 
         # Validasi input
@@ -247,12 +254,18 @@ def update_kegiatan(request, id):
 
         if tgl_selesai < tgl_mulai:
             return Response(
-                {'success': False, 'error': 'Tanggal selesai tidak boleh sebelum tanggal mulai'},
+                {'success': False, 'error': 'Tanggal dan waktu selesai tidak boleh sebelum tanggal dan waktu mulai'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         # Ambil kategori berdasarkan ID
-        kategori = Kategori.objects.get(id=kategori_id)
+        try:
+            kategori = Kategori.objects.get(id=kategori_id)
+        except Kategori.DoesNotExist:
+            return Response(
+                {'success': False, 'error': 'Kategori tidak ditemukan'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         # Update kegiatan
         kegiatan.nama = nama
@@ -262,7 +275,7 @@ def update_kegiatan(request, id):
         kegiatan.kategori_fk = kategori
         kegiatan.save()
         
-        User = get_user_model()   
+        User = get_user_model()
         users = User.objects.all()
 
         # Buat atau perbarui notifikasi untuk semua user
@@ -270,7 +283,7 @@ def update_kegiatan(request, id):
             notifikasi, created = Notifikasi.objects.get_or_create(
                 user_fk=user,
                 kegiatan_fk=kegiatan,
-                defaults={'status': 'Pending', 'metode': 'email', 'one_day_before': False, 'one_hour_before': False}   
+                defaults={'status': 'Pending', 'metode': 'email', 'one_day_before': False, 'one_hour_before': False}
             )
             # Jika notifikasi sudah ada, perbarui status dan flag
             if not created:
@@ -313,7 +326,8 @@ def delete_kegiatan(request, id):
             )
 
         # Hapus kegiatan
-        kegiatan.delete()
+        kegiatan.is_deleted = True
+        kegiatan.save()
 
         return Response(
             {'success': True, 'message': 'Kegiatan berhasil dihapus'},
