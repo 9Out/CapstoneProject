@@ -3,14 +3,16 @@ const pengumumanListElement = document.getElementById('pengumuman-list');
 const kegiatanListElement = document.getElementById('kegiatan-list');
 
 // Variabel untuk konfigurasi API
-const apiUrl = '/api/events/';
+const eventsApiUrl = '/api/events/';
+const userOrmawaApiUrl = '/api/user-ormawa/';
 const KATEGORI_NAMA_PENGUMUMAN = "Pengumuman";
 
+// Variabel untuk menyimpan data ormawa pengguna
+let userManagedOrmawa = [];
+
 // Fungsi untuk memformat tanggal ke format Indonesia (contoh: 14 Mei 2025)
-function formatDateIndonesia(dateString) {
-    if (!dateString) return '';
-    const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
+function formatDateIndonesia(date) {
+    if (!date) return '';
     return date.toLocaleDateString('id-ID', {
         day: 'numeric',
         month: 'long',
@@ -28,48 +30,75 @@ function createListItem(text, isNoDataMessage = false) {
     return li;
 }
 
-// Fungsi utama untuk mengambil dan merender data pengumuman dan kegiatan
-function fetchAndRenderData() {
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Gagal mengambil data dari API: ${response.status} ${response.statusText}`);
+// Fungsi untuk memuat data ormawa pengguna
+async function loadUserOrmawa() {
+    try {
+        const response = await fetch(userOrmawaApiUrl, {
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
             }
-            return response.json();
-        })
-        .then(data => {
-            pengumumanListElement.innerHTML = '';
-            kegiatanListElement.innerHTML = '';
+        });
+        if (!response.ok) {
+            throw new Error(`Gagal memuat daftar Ormawa: ${response.status} - ${response.statusText}`);
+        }
+        const data = await response.json();
+        // Simpan ID Ormawa yang diikuti pengguna (anggota, ketua, atau sekretaris)
+        userManagedOrmawa = data.ormawa_list.map(ormawa => ormawa.id);
+    } catch (err) {
+        console.error('Gagal memuat data ormawa:', err);
+        userManagedOrmawa = [];
+    }
+}
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+// Fungsi utama untuk mengambil dan merender data pengumuman dan kegiatan
+async function fetchAndRenderData() {
+    try {
+        // Muat data ormawa pengguna terlebih dahulu
+        await loadUserOrmawa();
 
-            const thirtyDaysLater = new Date(today);
-            thirtyDaysLater.setDate(today.getDate() + 30);
-            thirtyDaysLater.setHours(23, 59, 59, 999);
+        // Muat data kegiatan dari API
+        const response = await fetch(eventsApiUrl);
+        if (!response.ok) {
+            throw new Error(`Gagal mengambil data dari API: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
 
-            let pengumumanDitemukan = false;
-            let kegiatanDitemukan = false;
+        pengumumanListElement.innerHTML = '';
+        kegiatanListElement.innerHTML = '';
 
-            data.sort((a, b) => new Date(a.start) - new Date(b.start));
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-            data.forEach(item => {
-                const [startYear, startMonth, startDay] = item.start.split('-').map(Number);
-                const startDate = new Date(startYear, startMonth - 1, startDay);
-                startDate.setHours(0, 0, 0, 0);
+        const thirtyDaysLater = new Date(today);
+        thirtyDaysLater.setDate(today.getDate() + 30);
+        thirtyDaysLater.setHours(23, 59, 59, 999);
 
-                let actualEndDate = null;
-                if (item.end) {
-                    const [endYear, endMonth, endDay] = item.end.split('-').map(Number);
-                    actualEndDate = new Date(endYear, endMonth - 1, endDay);
-                    actualEndDate.setDate(actualEndDate.getDate() - 1);
-                } else {
-                    actualEndDate = new Date(startDate);
-                }
-                actualEndDate.setHours(23, 59, 59, 999);
+        let pengumumanDitemukan = false;
+        let kegiatanDitemukan = false;
 
-                if (item.kategori === KATEGORI_NAMA_PENGUMUMAN) {
-                    if (actualEndDate >= today) {
+        // Urutkan data berdasarkan start_date
+        data.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        data.forEach(item => {
+            // Konversi start_date dan end_date ke objek Date
+            const startDate = new Date(item.start);
+            startDate.setHours(0, 0, 0, 0);
+
+            let endDate = null;
+            if (item.end) {
+                endDate = new Date(item.end);
+                endDate.setHours(23, 59, 59, 999);
+            } else {
+                endDate = new Date(startDate);
+                endDate.setHours(23, 59, 59, 999);
+            }
+
+            // Bagian Pengumuman
+            if (item.kategori === KATEGORI_NAMA_PENGUMUMAN) {
+                // Hanya tampilkan pengumuman yang belum berakhir
+                if (endDate >= today) {
+                    // Jika kegiatan bersifat publik, tampilkan ke semua pengguna
+                    if (item.is_public) {
                         let displayText = `${item.title}`;
                         if (item.deskripsi) {
                             displayText += ` - ${item.deskripsi}`;
@@ -77,36 +106,52 @@ function fetchAndRenderData() {
                         pengumumanListElement.appendChild(createListItem(displayText));
                         pengumumanDitemukan = true;
                     }
-                } else {
-                    let displayText = null;
-
-                    if (startDate >= today && startDate <= thirtyDaysLater) {
-                        displayText = `${item.title}: ${formatDateIndonesia(item.start)}`;
-                    } else if (startDate < today && actualEndDate >= today && actualEndDate <= thirtyDaysLater) {
-                        displayText = `Akhir ${item.title}: ${formatDateIndonesia(actualEndDate.toISOString().slice(0, 10))}`;
-                    }
-
-                    if (displayText) {
-                        kegiatanListElement.appendChild(createListItem(displayText));
-                        kegiatanDitemukan = true;
+                    // Jika kegiatan tidak publik dan terkait ormawa, hanya tampilkan ke anggota ormawa
+                    else if (item.ormawa_fk && userManagedOrmawa.includes(item.ormawa_fk)) {
+                        let displayText = `${item.title}`;
+                        if (item.deskripsi) {
+                            displayText += ` - ${item.deskripsi}`;
+                        }
+                        pengumumanListElement.appendChild(createListItem(displayText));
+                        pengumumanDitemukan = true;
                     }
                 }
-            });
+            }
+            // Bagian Kegiatan Terdekat
+            else {
+                let displayText = null;
 
-            if (!pengumumanDitemukan) {
-                pengumumanListElement.appendChild(createListItem("Tidak ada pengumuman terkini.", true));
+                // Cek apakah start_date atau end_date dalam rentang 30 hari
+                if (startDate >= today && startDate <= thirtyDaysLater) {
+                    // Jika start_date belum lewat dan dalam 30 hari ke depan
+                    displayText = `Kegiatan ${item.title} dimulai pada ${formatDateIndonesia(startDate)}.`;
+                    kegiatanDitemukan = true;
+                } else if (startDate < today && endDate >= today && endDate <= thirtyDaysLater) {
+                    // Jika start_date sudah lewat tetapi end_date masih dalam 30 hari
+                    displayText = `Kegiatan ${item.title} berakhir pada ${formatDateIndonesia(endDate)}.`;
+                    kegiatanDitemukan = true;
+                }
+
+                if (displayText) {
+                    kegiatanListElement.appendChild(createListItem(displayText));
+                }
             }
-            if (!kegiatanDitemukan) {
-                kegiatanListElement.appendChild(createListItem("Tidak ada kegiatan terjadwal dalam 30 hari ke depan.", true));
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            pengumumanListElement.innerHTML = '';
-            kegiatanListElement.innerHTML = '';
-            pengumumanListElement.appendChild(createListItem("Gagal memuat pengumuman.", true));
-            kegiatanListElement.appendChild(createListItem("Gagal memuat kegiatan.", true));
         });
+
+        // Tampilkan pesan jika tidak ada data
+        if (!pengumumanDitemukan) {
+            pengumumanListElement.appendChild(createListItem("Tidak ada pengumuman terkini.", true));
+        }
+        if (!kegiatanDitemukan) {
+            kegiatanListElement.appendChild(createListItem("Tidak ada kegiatan terjadwal dalam 30 hari ke depan.", true));
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        pengumumanListElement.innerHTML = '';
+        kegiatanListElement.innerHTML = '';
+        pengumumanListElement.appendChild(createListItem("Gagal memuat pengumuman.", true));
+        kegiatanListElement.appendChild(createListItem("Gagal memuat kegiatan.", true));
+    }
 }
 
 // Inisiasi saat DOM selesai dimuat

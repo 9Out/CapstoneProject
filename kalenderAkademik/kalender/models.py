@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from ormawa.models import Ormawa
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 COLOR_CHOICES = [
@@ -176,6 +178,7 @@ class Kegiatan(models.Model):
     tgl_selesai = models.DateTimeField()
     user_fk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     kategori_fk = models.ForeignKey(Kategori, on_delete=models.CASCADE)
+    ormawa_fk = models.ForeignKey(Ormawa, on_delete=models.CASCADE, null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
     is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -199,12 +202,27 @@ class Kegiatan(models.Model):
     
 
 class Notifikasi(models.Model):
+    METODE_CHOICES = (
+        ('email', 'Email'),
+        ('whatsapp', 'WhatsApp'),
+    )
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Terkirim', 'Terkirim'),
+        ('Gagal', 'Gagal'),
+    )
+    ACTION_CHOICES = (
+        ('create', 'Create'),
+        ('update', 'Update'),
+        ('delete', 'Delete'),
+    )
     user_fk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     kegiatan_fk = models.ForeignKey(Kegiatan, on_delete=models.CASCADE)
-    metode = models.CharField(choices=[('email','Email'),('whatsapp','Whatsapp')], max_length=20, default='email')
-    status = models.CharField(choices=[('Pending','Pending'),('Terkirim','Terkirim'),('Gagal','Gagal')], max_length=20, default='Pending')
-    one_day_before = models.BooleanField(default=False)
-    one_hour_before = models.BooleanField(default=False)
+    metode = models.CharField(max_length=10, choices=METODE_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    action_type = models.CharField(max_length=10, choices=ACTION_CHOICES, default='create')
+    reminders = models.JSONField(default=list, blank=True) 
+    sent_reminders = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

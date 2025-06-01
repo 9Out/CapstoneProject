@@ -34,7 +34,7 @@ class TahunAkademikAdmin(admin.ModelAdmin):
 
 @admin.register(Notifikasi)
 class NotifikasiAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_fk', 'kegiatan_fk', 'metode', 'status', 'one_day_before', 'one_hour_before')
+    list_display = ('id', 'user_fk', 'kegiatan_fk', 'metode', 'status')
     search_fields = ('user_fk',)
     list_filter = ('kegiatan_fk', 'metode')
     ordering = ('id',)

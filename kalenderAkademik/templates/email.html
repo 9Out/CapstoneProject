@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengingat Kegiatan Akademik</title>
+    <title>{% if action_type == 'create' %}Kegiatan Baru{% elif action_type == 'update' %}Perubahan Jadwal{% else %}Pembatalan Kegiatan{% endif %}</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +21,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Container Utama */
         .email-wrapper {
             width: 100%;
             max-width: 600px;
@@ -35,7 +33,6 @@
             overflow: hidden;
         }
 
-        /* Header Email */
         .email-header {
             background: linear-gradient(135deg, #54a0ff 0%, #00d2ff 100%);
             padding: 24px 20px;
@@ -55,7 +52,6 @@
             font-size: 16px;
         }
 
-        /* Konten Email */
         .email-content {
             padding: 24px 16px;
             color: #fff;
@@ -75,7 +71,6 @@
             line-height: 1.7;
         }
 
-        /* Detail Kegiatan */
         .event-card {
             background-color: #2a2a2a;
             border-radius: 12px;
@@ -125,7 +120,6 @@
             vertical-align: top;
         }
 
-        /* Footer Email */
         .email-footer {
             background-color: #2a2a2a;
             padding: 16px;
@@ -135,7 +129,6 @@
             border-top: 1px solid #3a3a3a;
         }
 
-        /* Media Queries untuk Mobile */
         @media only screen and (max-width: 600px) {
             .email-header {
                 padding: 20px 16px;
@@ -153,12 +146,19 @@
         }
     </style>
 </head>
-
 <body>
     <div class="email-wrapper">
         <div class="email-container">
             <div class="email-header">
-                <h2>Pengingat Kegiatan Akademik</h2>
+                <h2>
+                    {% if action_type == 'create' %}
+                        Kegiatan Baru
+                    {% elif action_type == 'update' %}
+                        Perubahan Jadwal Kegiatan
+                    {% else %}
+                        Pembatalan Kegiatan
+                    {% endif %}
+                </h2>
             </div>
 
             <div class="email-content">
@@ -167,29 +167,43 @@
                 <div class="message">{{ pesan }}</div>
 
                 <div class="event-card">
-                    <div class="event-title">Detail Kegiatan</div>
+                    <div class="event-title">
+                        {% if action_type == 'delete' %}
+                            Kegiatan Dibatalkan
+                        {% else %}
+                            Detail Kegiatan
+                        {% endif %}
+                    </div>
 
                     <table class="detail-table">
                         <tr>
                             <td class="detail-label">Kegiatan</td>
                             <td class="detail-value">{{ kegiatan }}</td>
                         </tr>
-                        <tr>
-                            <td class="detail-label">Tanggal Mulai</td>
-                            <td class="detail-value">{{ tgl_mulai }}</td>
-                        </tr>
-                        <tr>
-                            <td class="detail-label">Tanggal Selesai</td>
-                            <td class="detail-value">{{ tgl_selesai }}</td>
-                        </tr>
-                        <tr>
-                            <td class="detail-label">Semester</td>
-                            <td class="detail-value">{{ semester }}</td>
-                        </tr>
-                        <tr>
-                            <td class="detail-label">Tahun Akademik</td>
-                            <td class="detail-value">{{ tahun_ajaran }}</td>
-                        </tr>
+                        {% if ormawa_nama %}
+                            <tr>
+                                <td class="detail-label">Organisasi</td>
+                                <td class="detail-value">{{ ormawa_nama }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if action_type != 'delete' %}
+                            <tr>
+                                <td class="detail-label">Tanggal Mulai</td>
+                                <td class="detail-value">{{ tgl_mulai }} ({{ waktu_mulai }})</td>
+                            </tr>
+                            <tr>
+                                <td class="detail-label">Tanggal Selesai</td>
+                                <td class="detail-value">{{ tgl_selesai }} ({{ waktu_selesai }})</td>
+                            </tr>
+                            <tr>
+                                <td class="detail-label">Semester</td>
+                                <td class="detail-value">{{ semester }}</td>
+                            </tr>
+                            <tr>
+                                <td class="detail-label">Tahun Akademik</td>
+                                <td class="detail-value">{{ tahun_ajaran }}</td>
+                            </tr>
+                        {% endif %}
                     </table>
                 </div>
             </div>
@@ -200,5 +214,4 @@
         </div>
     </div>
 </body>
-
 </html>
