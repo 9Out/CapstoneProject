@@ -16,10 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from kalender.views import KegiatanListView, save_notification, category_list, add_kegiatan, delete_kegiatan, update_kegiatan
+from kalender.views import KegiatanListView, save_notification, category_list, add_kegiatan, delete_kegiatan, update_kegiatan, user_ormawa_list, save_notification_reminders
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name='admin'),
     path('', include('home.urls')),
     path('kalender/', include('kalender.urls')),
     path('about/', include('aboutUs.urls')),
@@ -30,5 +30,7 @@ urlpatterns = [
     path('api/events/add/', add_kegiatan, name='add-kegiatan'),
     path('api/events/update/<int:id>/', update_kegiatan, name='update-kegiatan'),
     path('api/events/delete/<int:id>/', delete_kegiatan, name='delete-kegiatan'),
+    path('api/user-ormawa/', user_ormawa_list, name='user-ormawa-list'),
+    path('api/save-notification-reminders/', save_notification_reminders, name='save-notification-reminders'),
 ]
 

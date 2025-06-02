@@ -2,12 +2,23 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from .forms import CustomAuthenticationForm
 from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+
 
 class Custom_login(LoginView):
     template_name = 'userAuth/login.html'
     form_class = CustomAuthenticationForm
     redirect_authenticated_user = True
-
+    
+    def get_success_url(self):
+        user = self.request.user
+        if user.is_authenticated:
+            if user.is_staff: 
+                return reverse_lazy('admin:index')
+            else:
+                return reverse_lazy('home:home') 
+        return super().get_success_url()
+    
 
 
 # def login_view(request):

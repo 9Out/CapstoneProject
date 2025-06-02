@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Notifikasi, Kategori, Kegiatan, TahunAkademik
+from .models import Notifikasi, Kategori, Kegiatan
 # Register your models here.
 
 @admin.register(Kategori)
@@ -25,16 +25,16 @@ class KegiatanAdmin(admin.ModelAdmin):
             obj.user_fk = request.user
         super().save_model(request, obj, form, change)
     
-@admin.register(TahunAkademik)
-class TahunAkademikAdmin(admin.ModelAdmin):
-    list_display = ('id', 'tahun_akademik')
-    search_fields = ('tahun_akademik',)
-    list_filter = ('tahun_akademik',)
-    ordering = ('id',)
+# @admin.register(TahunAkademik)
+# class TahunAkademikAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'tahun_akademik')
+#     search_fields = ('tahun_akademik',)
+#     list_filter = ('tahun_akademik',)
+#     ordering = ('id',)
 
 @admin.register(Notifikasi)
 class NotifikasiAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_fk', 'kegiatan_fk', 'metode', 'status', 'one_day_before', 'one_hour_before')
+    list_display = ('id', 'user_fk', 'kegiatan_fk', 'metode', 'status')
     search_fields = ('user_fk',)
     list_filter = ('kegiatan_fk', 'metode')
     ordering = ('id',)
