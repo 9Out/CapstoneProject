@@ -154,11 +154,6 @@ COLOR_CHOICES = [
         ('#ff83fa', 'Orchid Cerah'), 
 ]
 
-class TahunAkademik(models.Model):
-    tahun_akademik = models.CharField(max_length=10)
-    def __str__(self):
-        return self.tahun_akademik
-
 class Kategori(models.Model):
     nama = models.CharField(max_length=50)
     warna = models.CharField(unique=True,
@@ -170,8 +165,8 @@ class Kategori(models.Model):
         return self.nama
 
 class Kegiatan(models.Model):
-    tahun_akademik = models.ForeignKey(TahunAkademik, on_delete=models.CASCADE)
-    semester = models.CharField(choices=[('Ganjil','Ganjil'),('Genap','Genap')], max_length=20)
+    tahun_akademik = models.CharField(blank=True, null=True, max_length=10)
+    semester = models.CharField(choices=[('Ganjil','Ganjil'),('Genap','Genap')], blank=True, null=True, max_length=20)
     nama = models.CharField(max_length=50)
     deskripsi = models.TextField(max_length=254, blank=True, null=True)
     tgl_mulai = models.DateTimeField()
@@ -195,8 +190,18 @@ class Kegiatan(models.Model):
         else:
             return 'Ganjil'
         
+    @property
+    def tahun_akademik_aktivitas(self):
+        bulan_mulai = self.tgl_mulai.month
+        tahun = self.tgl_mulai.year
+        if bulan_mulai >= 8: 
+            return f"{tahun}-{tahun + 1}"
+        else:  
+            return f"{tahun - 1}-{tahun}"
+        
     def save(self, *args, **kwargs):
         self.semester = self.semester_aktivitas
+        self.tahun_akademik = self.tahun_akademik_aktivitas
         super(Kegiatan, self).save(*args, **kwargs)
     
     

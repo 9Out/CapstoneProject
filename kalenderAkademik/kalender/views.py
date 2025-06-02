@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
-from .models import Notifikasi, Kegiatan, Kategori, TahunAkademik
+from .models import Notifikasi, Kegiatan, Kategori
 from .tasks import send_email_notification, send_whatsapp_notification, check_notifications
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
@@ -34,8 +34,7 @@ def add_kegiatan(request):
         tgl_mulai = parse_datetime(data.get('start'))
         tgl_selesai = parse_datetime(data.get('end')) if data.get('end') else tgl_mulai.replace(hour=23, minute=59, second=59)
         kategori_id = data.get('kategori_id')
-        tahun_akademik_id = data.get('tahun_akademik_id')
-        semester = data.get('semester', 'Ganjil')
+        semester = data.get('semester', 'Ganjil') 
         is_public = data.get('is_public', True)
         ormawa_id = data.get('ormawa_id')
         notify_to = data.get('notify_to', 'all' if is_public else 'ormawa')
@@ -62,16 +61,6 @@ def add_kegiatan(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        tahun_akademik = TahunAkademik.objects.first()
-        if tahun_akademik_id:
-            try:
-                tahun_akademik = TahunAkademik.objects.get(id=tahun_akademik_id)
-            except TahunAkademik.DoesNotExist:
-                return Response(
-                    {'success': False, 'error': 'Tahun akademik tidak ditemukan'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-
         ormawa = None
         if ormawa_id:
             try:
@@ -94,8 +83,6 @@ def add_kegiatan(request):
 
         with transaction.atomic():
             kegiatan = Kegiatan.objects.create(
-                tahun_akademik=tahun_akademik,
-                semester=semester,
                 nama=nama,
                 deskripsi=deskripsi,
                 tgl_mulai=tgl_mulai,
@@ -104,7 +91,7 @@ def add_kegiatan(request):
                 kategori_fk=kategori,
                 is_public=is_public,
                 ormawa_fk=ormawa
-            )
+            )  
 
             User = get_user_model()
             if notify_to == 'all':
@@ -247,7 +234,7 @@ class KegiatanListView(generics.ListAPIView):
                         tgl_selesai__gte=start_date
                     ).order_by('tgl_mulai')
             elif academic_year_param:
-                queryset = queryset.filter(tahun_akademik__tahun_akademik=academic_year_param).order_by('tgl_mulai')
+                queryset = queryset.filter(tahun_akademik=academic_year_param).order_by('tgl_mulai')  # Diubah dari tahun_akademik__tahun_akademik
             else:
                 parsed_year = None
                 parsed_month = None
@@ -358,7 +345,7 @@ def update_kegiatan(request, id):
             kegiatan.kategori_fk = kategori
             kegiatan.is_public = is_public
             kegiatan.ormawa_fk = ormawa
-            kegiatan.save()
+            kegiatan.save()  
 
             User = get_user_model()
             if notify_to == 'all':

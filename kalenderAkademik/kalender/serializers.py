@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Kegiatan, Kategori
 from django.utils import timezone
-from datetime import timedelta
 
 # Serializer untuk model Kategori
 class KategoriSerializer(serializers.ModelSerializer):
@@ -20,10 +19,11 @@ class KegiatanSerializer(serializers.ModelSerializer):
     end = serializers.DateTimeField(source='tgl_selesai', allow_null=True)             
     user_fk = serializers.PrimaryKeyRelatedField(read_only=True)    
     ormawa_fk = serializers.PrimaryKeyRelatedField(read_only=True)
+    tahun_akademik = serializers.CharField(read_only=True)  
 
     class Meta:
         model = Kegiatan
-        fields = ['id', 'title', 'start', 'end', 'nama', 'deskripsi', 'kategori_fk', 'backgroundColor', 'borderColor', 'user_fk', 'ormawa_fk']
+        fields = ['id', 'title', 'start', 'end', 'nama', 'deskripsi', 'kategori_fk', 'backgroundColor', 'borderColor', 'user_fk', 'ormawa_fk', 'tahun_akademik', 'semester', 'is_public']
     
     def to_representation(self, instance):
         """Menyesuaikan format output untuk kebutuhan frontend"""
@@ -40,13 +40,12 @@ class KegiatanSerializer(serializers.ModelSerializer):
             end_date_stripped = end_date.replace(hour=0, minute=0, second=0, microsecond=0)
             if start_date_stripped == end_date_stripped:
                 all_day = True
-            # Tidak menambahkan 1 hari ke end_date, biarkan FullCalendar menangani eksklusif
 
         return {
             'id': data['id'],
             'title': data['nama'],
             'start': start_date.isoformat() if start_date else None,
-            'end': end_date.isoformat() if end_date else None,  # Gunakan end_date asli
+            'end': end_date.isoformat() if end_date else None,
             'deskripsi': instance.deskripsi,
             'kategori': kategori.nama,
             'kategori_id': kategori.id,
@@ -57,4 +56,6 @@ class KegiatanSerializer(serializers.ModelSerializer):
             'ormawa_nama': instance.ormawa_fk.nama if instance.ormawa_fk else None,
             'is_public': instance.is_public,
             'allDay': all_day,
+            'tahun_akademik': instance.tahun_akademik,  
+            'semester': instance.semester,
         }
