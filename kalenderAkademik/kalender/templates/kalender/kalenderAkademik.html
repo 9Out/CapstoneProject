@@ -465,11 +465,16 @@
     }
 
     /** Memuat daftar kategori dari API ke elemen select */
-    async function loadCategories(targetSelect) {
+    async function loadCategories(targetSelect, isEdit = false) {
         try {
-            const response = await fetch('/api/categories/');
+            const response = await fetch('/api/categories/', {
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                }
+            });
             if (!response.ok) throw new Error('Gagal memuat kategori');
             const categories = await response.json();
+
             targetSelect.innerHTML = '<option value="">Pilih Kategori</option>';
             categories.forEach(cat => {
                 const option = document.createElement('option');
@@ -477,6 +482,14 @@
                 option.textContent = cat.nama;
                 targetSelect.appendChild(option);
             });
+
+            // Jika ketua/sekretaris dan bukan mode edit, pilih kategori Ormawa secara otomatis
+            if (isLeader && !isEdit) {
+                const ormawaCategory = categories.find(cat => cat.nama === 'Ormawa');
+                if (ormawaCategory) {
+                    targetSelect.value = ormawaCategory.id;
+                }
+            }
         } catch (err) {
             showCustomAlert('Gagal memuat kategori. Silakan coba lagi.', 'error');
         }

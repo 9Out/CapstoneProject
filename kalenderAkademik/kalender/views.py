@@ -18,8 +18,16 @@ from django.db import transaction
 # Create your views here.
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def category_list(request):
-    categories = Kategori.objects.all()
+    user = request.user
+    is_leader = Ormawa.objects.filter(user=user, ketua=user).exists() or Ormawa.objects.filter(user=user, sekretaris=user).exists()
+    if is_leader:
+        # Hanya kembalikan kategori dengan is_ormawa=True
+        categories = Kategori.objects.filter(is_ormawa=True)
+    else:
+        # Kembalikan semua kategori
+        categories = Kategori.objects.all()           
     serializer = KategoriSerializer(categories, many=True)
     return Response(serializer.data)
 
@@ -40,7 +48,20 @@ def add_kegiatan(request):
         notify_to = data.get('notify_to', 'all' if is_public else 'ormawa')
         notify_email = data.get('notify_email', True)
         notify_whatsapp = data.get('notify_whatsapp', False)
-
+        
+        is_leader = Ormawa.objects.filter(user=request.user, ketua=request.user).exists() or Ormawa.objects.filter(user=request.user, sekretaris=user).exists()
+        
+        if is_leader and ormawa_id:
+            # Jika user adalah ketua atau sekretaris Ormawa, gunakan kategori Ormawa
+            try:
+                ormawa_category = Kategori.objects.get(nama='Ormawa', is_ormawa=True)
+                kategori_id = ormawa_category.id
+            except Kategori.DoesNotExist:
+                return Response(
+                    {'success': False, 'error': 'Kategori Ormawa tidak ditemukan'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+                
         if not all([nama, tgl_mulai, kategori_id]):
             return Response(
                 {'success': False, 'error': 'Nama, tanggal mulai, dan kategori wajib diisi'},
@@ -55,6 +76,11 @@ def add_kegiatan(request):
 
         try:
             kategori = Kategori.objects.get(id=kategori_id)
+            if is_leader and not kategori.is_ormawa:
+                return Response(
+                    {'success': False, 'error': 'Hanya kategori Ormawa yang diperbolehkan untuk ketua/sekretaris'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
         except Kategori.DoesNotExist:
             return Response(
                 {'success': False, 'error': 'Kategori tidak ditemukan'},
@@ -234,8 +260,7 @@ class KegiatanListView(generics.ListAPIView):
                         tgl_selesai__gte=start_date
                     ).order_by('tgl_mulai')
             elif academic_year_param:
-                queryset = queryset.filter(tahun_akademik=academic_year_param).order_by('tgl_mulai')  # Diubah dari tahun_akademik__tahun_akademik
-            else:
+                queryset = queryset.filter(tahun_akademik=academic_year_param).order_by('tgl_mulai') 
                 parsed_year = None
                 parsed_month = None
 
@@ -279,7 +304,11 @@ class KegiatanListView(generics.ListAPIView):
 def update_kegiatan(request, id):
     try:
         kegiatan = Kegiatan.objects.get(id=id)
-        if kegiatan.user_fk != request.user:
+        if kegiatan.user_fk != request.user and not (
+            kegiatan.ormawa_fk and (
+                request.user == kegiatan.ormawa_fk.ketua or request.user == kegiatan.ormawa_fk.sekretaris
+            )
+        ):
             return Response(
                 {'success': False, 'error': 'Anda tidak memiliki izin untuk mengedit kegiatan ini'},
                 status=status.HTTP_403_FORBIDDEN
@@ -297,6 +326,21 @@ def update_kegiatan(request, id):
         notify_email = data.get('notify_email', True)
         notify_whatsapp = data.get('notify_whatsapp', False)
 
+        is_leader = kegiatan.ormawa_fk and (
+            request.user == kegiatan.ormawa_fk.ketua or request.user == kegiatan.ormawa_fk.sekretaris
+        )
+
+        if is_leader and ormawa_id:
+            # kategori menjadi "Ormawa"
+            try:
+                ormawa_category = Kategori.objects.get(nama='Ormawa', is_ormawa=True)
+                kategori_id = ormawa_category.id
+            except Kategori.DoesNotExist:
+                return Response(
+                    {'success': False, 'error': 'Kategori Ormawa tidak ditemukan'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
         if not all([nama, tgl_mulai, kategori_id]):
             return Response(
                 {'success': False, 'error': 'Nama, tanggal mulai, dan kategori wajib diisi'},
@@ -311,6 +355,11 @@ def update_kegiatan(request, id):
 
         try:
             kategori = Kategori.objects.get(id=kategori_id)
+            if is_leader and not kategori.is_ormawa:
+                return Response(
+                    {'success': False, 'error': 'Hanya kategori Ormawa yang diperbolehkan untuk ketua/sekretaris'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
         except Kategori.DoesNotExist:
             return Response(
                 {'success': False, 'error': 'Kategori tidak ditemukan'},
@@ -345,7 +394,7 @@ def update_kegiatan(request, id):
             kegiatan.kategori_fk = kategori
             kegiatan.is_public = is_public
             kegiatan.ormawa_fk = ormawa
-            kegiatan.save()  
+            kegiatan.save()
 
             User = get_user_model()
             if notify_to == 'all':

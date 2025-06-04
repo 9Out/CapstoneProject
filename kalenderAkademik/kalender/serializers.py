@@ -7,7 +7,7 @@ class KategoriSerializer(serializers.ModelSerializer):
     """Mengonversi data Kategori ke format JSON"""
     class Meta:
         model = Kategori
-        fields = ['id', 'nama', 'warna']
+        fields = ['id', 'nama', 'warna', 'is_ormawa']
 
 # Serializer untuk model Kegiatan
 class KegiatanSerializer(serializers.ModelSerializer):

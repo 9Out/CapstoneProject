@@ -161,6 +161,7 @@ class Kategori(models.Model):
         choices = COLOR_CHOICES,
         default='#00205b'
     )
+    is_ormawa = models.BooleanField(default=False)
     def __str__(self):
         return self.nama
 
@@ -178,6 +179,11 @@ class Kegiatan(models.Model):
     is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        permissions = [
+            ('add_kegiatan_self', 'Can add kegiatan for self'),
+        ]
 
     def __str__(self):
         return self.nama
