@@ -7,7 +7,9 @@ import pytz
 from datetime import datetime, timedelta
 import requests
 import re
-
+from django.utils import timezone
+import logging
+logger = logging.getLogger(__name__)
 
 def format_no_telpon(no_telpon):
     no_telpon = re.sub(r'[^0-9+]', '', no_telpon)
@@ -87,90 +89,132 @@ def send_email_notification(notifikasi_id, is_scheduled=False):
         raise e
 
 @shared_task
-def send_whatsapp_notification(notifikasi_id):
+def send_whatsapp_notification(notifikasi_id, is_scheduled=False):
     try:
-        # Preload kegiatan_fk dan ormawa_fk
         notifikasi = Notifikasi.objects.select_related('kegiatan_fk__ormawa_fk').get(id=notifikasi_id)
         if notifikasi.metode != 'whatsapp':
             return
-
         nama_lengkap = f"{notifikasi.user_fk.first_name} {notifikasi.user_fk.last_name}".strip() or notifikasi.user_fk.username
         nomor_whatsapp = notifikasi.user_fk.no_telpon
-
         formatted_number = format_no_telpon(nomor_whatsapp)
-
         wib_tz = pytz.timezone('Asia/Jakarta')
         tgl_mulai_wib = notifikasi.kegiatan_fk.tgl_mulai.replace(tzinfo=pytz.UTC).astimezone(wib_tz)
         tgl_mulai_formatted = tgl_mulai_wib.strftime('%d-%m-%Y')
         tgl_selesai_wib = notifikasi.kegiatan_fk.tgl_selesai.replace(tzinfo=pytz.UTC).astimezone(wib_tz)
         tgl_selesai_formatted = tgl_selesai_wib.strftime('%d-%m-%Y')
         
+        if not nomor_whatsapp:
+            notifikasi.status = 'Gagal'
+            notifikasi.save()
+            return
+        
         # Ambil nama Ormawa dari kegiatan
         ormawa_nama = notifikasi.kegiatan_fk.ormawa_fk.nama if notifikasi.kegiatan_fk.ormawa_fk else None
-        
         ormawa_text = f" (oleh {ormawa_nama})" if ormawa_nama else ""
-
-        # Sesuaikan pesan berdasarkan action_type
-        if notifikasi.action_type == 'create':
+        # pesan berdasarkan action_type dan is_scheduled
+        if not is_scheduled:
+            if notifikasi.action_type == 'create':
+                message = (
+                    f"Hai, Kak👋 {nama_lengkap},\n\n"
+                    f"Ada kegiatan baru: *{notifikasi.kegiatan_fk.nama}*{ormawa_text}\n"
+                    f"Tanggal: {tgl_mulai_formatted} s.d. {tgl_selesai_formatted}\n\n"
+                    "Jangan lupa ya😉\n"
+                )
+            elif notifikasi.action_type == 'update':
+                message = (
+                    f"Hai, Kak👋 {nama_lengkap},\n\n"
+                    f"Ada perubahan jadwal kegiatan: *{notifikasi.kegiatan_fk.nama}*{ormawa_text}\n"
+                    f"Tanggal: {tgl_mulai_formatted} s.d. {tgl_selesai_formatted}\n\n"
+                    "Harap diperhatikan ya😉\n"
+                )
+            else:  # action_type == 'delete'
+                message = (
+                    f"Hai, Kak👋 {nama_lengkap},\n\n"
+                    f"Kegiatan berikut telah dibatalkan: *{notifikasi.kegiatan_fk.nama}*{ormawa_text}\n"
+                    f"Tanggal: {tgl_mulai_formatted} s.d. {tgl_selesai_formatted}\n\n"
+                    "Terima kasih atas perhatiannya.\n"
+                )
+        else:  # is_scheduled=True (pengingat)
             message = (
                 f"Hai, Kak👋 {nama_lengkap},\n\n"
-                f"Ada kegiatan baru: *{notifikasi.kegiatan_fk.nama}*{ormawa_text}\n"
+                f"*Pengingat:* Kegiatan *{notifikasi.kegiatan_fk.nama}*{ormawa_text}\n"
                 f"Tanggal: {tgl_mulai_formatted} s.d. {tgl_selesai_formatted}\n\n"
                 "Jangan lupa ya😉\n"
             )
-        elif notifikasi.action_type == 'update':
-            message = (
-                f"Hai, Kak👋 {nama_lengkap},\n\n"
-                f"Ada perubahan jadwal kegiatan: *{notifikasi.kegiatan_fk.nama}*{ormawa_text}\n"
-                f"Tanggal: {tgl_mulai_formatted} s.d. {tgl_selesai_formatted}\n\n"
-                "Harap diperhatikan ya😉\n"
-            )
-        else:  # action_type == 'delete'
-            message = (
-                f"Hai, Kak👋 {nama_lengkap},\n\n"
-                f"Kegiatan berikut telah dibatalkan: *{notifikasi.kegiatan_fk.nama}*{ormawa_text}\n"
-                f"Tanggal: {tgl_mulai_formatted} s.d. {tgl_selesai_formatted}\n\n"
-                "Terima kasih atas perhatiannya.\n"
-            )
-
         response = requests.post('http://localhost:3000/send-message', json={
             'phone': formatted_number,
             'message': message
         })
         response.raise_for_status()
-
-        notifikasi.status = 'Terkirim'
-        notifikasi.save()
-
+        # Hanya ubah status ke 'Terkirim' jika bukan pengingat
+        if not is_scheduled:
+            if not notifikasi.reminders:
+                notifikasi.status = 'Terkirim'
+                notifikasi.save()
     except Exception as e:
         notifikasi.status = 'Gagal'
         notifikasi.save()
         raise e
 
+
 @shared_task
 def check_notifications():
+    now = timezone.now()
     wib_tz = pytz.timezone('Asia/Jakarta')
-    now = datetime.now(pytz.UTC).astimezone(wib_tz)
-    notifikasi_list = Notifikasi.objects.filter(status='Pending', action_type='reminder')
+    logger.info(f"Checking scheduled notifications at {now.astimezone(wib_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}")
 
-    for notifikasi in notifikasi_list:
-        tgl_mulai_wib = notifikasi.kegiatan_fk.tgl_mulai.replace(tzinfo=pytz.UTC).astimezone(wib_tz)
-        for reminder in notifikasi.reminders:
-            days = reminder.get('days', 0)
-            time = reminder.get('time', '09:00')
-            reminder_key = f"{days}_day_{time.replace(':', '_')}"  # Unique key, e.g., "1_day_09_00"
+    # Ambil semua notifikasi pending
+    pending_notifications = Notifikasi.objects.filter(status='Pending')
 
-            if reminder_key in notifikasi.sent_reminders:
-                continue 
+    for notifikasi in pending_notifications:
+        # Hanya proses jika notifikasi memiliki data reminder
+        if not notifikasi.reminders:
+            continue
 
-            reminder_time = tgl_mulai_wib - timedelta(days=days)
-            reminder_time = reminder_time.replace(hour=int(time.split(':')[0]), minute=int(time.split(':')[1]), second=0)
+        for i, reminder in enumerate(notifikasi.reminders):
+            # kunci unik untuk setiap reminder
+            reminder_key = f"reminder_{i}"
 
-            time_difference = (reminder_time - now).total_seconds()
-            if 0 <= time_difference <= 3600:  # Within 1 hour window
-                if notifikasi.metode == 'whatsapp':
-                    send_whatsapp_notification.delay(notifikasi.id, is_scheduled=True)
-                elif notifikasi.metode == 'email':
-                    send_email_notification.delay(notifikasi.id, is_scheduled=True)
-                notifikasi.sent_reminders[reminder_key] = True
-                notifikasi.save()
+            # Lewati (continue) jika reminder pernah dikirim
+            if notifikasi.sent_reminders.get(reminder_key):
+                continue
+
+            # Ambil detail reminder
+            days_before = reminder.get('days', 0)
+            reminder_time_str = reminder.get('time', '09:00')
+
+            try:
+                # Hitung waktu pengiriman reminder dalam zona waktu WIB
+                kegiatan = notifikasi.kegiatan_fk
+                tgl_mulai_wib = kegiatan.tgl_mulai.astimezone(wib_tz)
+                
+                reminder_datetime_wib = tgl_mulai_wib - timedelta(days=days_before)
+                hour, minute = map(int, reminder_time_str.split(':'))
+                reminder_datetime_wib = reminder_datetime_wib.replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+                # Konversi kembali ke UTC 
+                reminder_datetime_utc = reminder_datetime_wib.astimezone(pytz.UTC)
+
+                # Cek apakah waktu sekarang berada dalam rentang pengiriman
+                if reminder_datetime_utc <= now < reminder_datetime_utc + timedelta(minutes=10):
+                    logger.info(f"Sending reminder '{reminder_key}' for Notifikasi ID: {notifikasi.id}")
+
+                    # Kirim notifikasi sesuai metodenya
+                    if notifikasi.metode == 'email':
+                        send_email_notification.delay(notifikasi.id, is_scheduled=True)
+                    elif notifikasi.metode == 'whatsapp':
+                        send_whatsapp_notification.delay(notifikasi.id, is_scheduled=True)
+
+                    # Tandai bahwa reminder ini telah berhasil dikirim
+                    notifikasi.sent_reminders[reminder_key] = True
+
+                    # Cek apakah semua reminder sudah terkirim
+                    if len(notifikasi.sent_reminders) == len(notifikasi.reminders):
+                        notifikasi.status = 'Terkirim'
+                        logger.info(f"All reminders sent. Setting Notifikasi ID: {notifikasi.id} to 'Terkirim'.")
+                    
+                    # Simpan perubahan pada notifikasi (sent_reminders dan status)
+                    notifikasi.save()
+
+            except Exception as e:
+                logger.error(f"Failed to process reminder for Notifikasi ID {notifikasi.id}: {e}")

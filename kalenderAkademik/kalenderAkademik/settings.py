@@ -133,7 +133,7 @@ DATABASES = {
         'USER':'root',
         'PASSWORD': '',
         'HOST':'localhost',
-        'PORT':'',
+        'PORT':'3307',
         'OPTIONS':{
             'charset':'utf8mb4'
         }
@@ -203,9 +203,12 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'kalenderakademikums.project@gmail.com'  
-EMAIL_HOST_PASSWORD = 'vooi mima vxav znkt' 
-DEFAULT_FROM_EMAIL = 'kalenderakademikums.project@gmail.com'
+# EMAIL_HOST_USER = 'kalenderakademikums.project@gmail.com'  
+EMAIL_HOST_USER = 'magang730@gmail.com'
+# EMAIL_HOST_PASSWORD = 'vooi mima vxav znkt' 
+EMAIL_HOST_PASSWORD = 'uugl qzyx wtha vtyc' 
+# DEFAULT_FROM_EMAIL = 'kalenderakademikums.project@gmail.com'
+DEFAULT_FROM_EMAIL = 'magang730@gmail.com'
 
 
 # CELERY CONF
@@ -220,6 +223,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     'check-notifications-every-minute': {
         'task': 'kalender.tasks.check_notifications',
-        'schedule': 30.0,  
+        'schedule': 15.0,  
     },
 }

@@ -25,11 +25,10 @@
             <!-- Tombol tambah -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h2>Agenda Akademik</h2>
-                {% if perms.kalender.add_kegiatan or is_leader %}
+                {% if perms.kalender.add_kegiatan or is_leader or can_add_self_kegiatan %}
                 <button onclick="openModal()" class="kalender-btn-add">Tambah</button>
                 {% endif %}
             </div>
-            <!-- End Tombol tambah -->
 
             <!-- Modal untuk tambah kegiatan -->
             <div id="eventModal" class="kalender-page-modal">
@@ -39,7 +38,6 @@
                     <form id="eventForm">
                         <label for="eventTitle">Nama Kegiatan</label>
                         <input type="text" id="eventTitle" name="nama" placeholder="Nama Kegiatan" required />
-
                         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 120px;">
                                 <label for="eventStart">Tanggal Mulai</label>
@@ -75,6 +73,18 @@
                             </div>
                         </div>
 
+                        {% if can_add_public_kegiatan and can_add_self_kegiatan and not is_leader %}
+                        <div id="publicSelfChoiceSection" style="display: none;">
+                            <div
+                                style="display: flex; justify-content: flex-end; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                                <div class="kalender-checkbox-container">
+                                    <input type="checkbox" id="eventIsPublicChoice" name="is_public_choice" checked>
+                                    <label for="eventIsPublicChoice">Tampilkan untuk Publik</label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <div id="ormawaPublicSection" style="display: none;">
                             <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
                                 <div style="flex: 1; min-width: 120px;">
@@ -105,6 +115,26 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Tambahan Opsi Pengingat -->
+                        <div class="kalender-reminder-section">
+                            <span class="kalender-notification-title">Pengaturan Pengingat</span>
+                            <div class="kalender-checkbox-grid">
+                                <div class="kalender-checkbox-container">
+                                    <input type="checkbox" id="eventReminderEnable" name="reminder_enable" checked>
+                                    <label for="eventReminderEnable">Aktifkan Pengingat</label>
+                                </div>
+                            </div>
+                            <div id="reminderOptions" style="margin-top: 0.5rem;">
+                                <label for="eventReminderDays">Waktu Pengingat</label>
+                                <select id="eventReminderDays" name="reminder_days">
+                                    <option value="1" selected>1 Hari Sebelum</option>
+                                    <option value="7">1 Minggu Sebelum</option>
+                                    <option value="14">2 Minggu Sebelum</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- End Opsi Pengingat -->
 
                         <label for="eventDescription" style="margin-top: 0.5rem;">Deskripsi/Lokasi</label>
                         <input type="text" id="eventDescription" name="deskripsi" placeholder="Deskripsi atau Lokasi" />
@@ -147,6 +177,19 @@
                             </div>
                         </div>
 
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                            <div style="flex: 1; min-width: 120px;">
+                                <label for="editEventDays">Jumlah Hari</label>
+                                <input type="text" id="editEventDays" readonly />
+                            </div>
+                            <div style="flex: 1; min-width: 120px;">
+                                <label for="editEventCategory">Kategori</label>
+                                <select id="editEventCategory" name="kategori_id" required>
+                                    <option value="">Pilih Kategori</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div id="editOrmawaPublicSection" style="display: none;">
                             <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
                                 <div style="flex: 1; min-width: 120px;">
@@ -178,18 +221,31 @@
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="editEventDays">Jumlah Hari</label>
-                                <input type="text" id="editEventDays" readonly />
+                        <!-- Tambahan Opsi Pengingat -->
+                        <div class="kalender-reminder-section">
+                            <span class="kalender-notification-title">Pengaturan Pengingat</span>
+                            <div class="kalender-checkbox-grid">
+                                <div class="kalender-checkbox-container">
+                                    <input type="checkbox" id="editEventReminderEnable" name="reminder_enable" checked>
+                                    <label for="editEventReminderEnable">Aktifkan Pengingat</label>
+                                </div>
                             </div>
-                            <div style="flex: 1; min-width: 120px;">
-                                <label for="editEventCategory">Kategori</label>
-                                <select id="editEventCategory" name="kategori_id" required>
-                                    <option value="">Pilih Kategori</option>
+                            <div id="editReminderOptions" style="margin-top: 0.5rem;">
+                                <label for="editEventReminderDays">Waktu Pengingat</label>
+                                <select id="editEventReminderDays" name="reminder_days">
+                                    <option value="1" selected>1 Hari Sebelum</option>
+                                    <option value="7">1 Minggu Sebelum</option>
+                                    <option value="14">2 Minggu Sebelum</option>
+                                    <option value="custom">Atur Sendiri</option>
                                 </select>
+                                <div id="editCustomReminder" style="display: none; margin-top: 0.5rem;">
+                                    <input type="number" id="editCustomReminderDays" name="custom_reminder_days" min="0"
+                                        max="30" placeholder="Hari" style="width: 100px;" />
+                                    <input type="time" id="editCustomReminderTime" name="custom_reminder_time" />
+                                </div>
                             </div>
                         </div>
+                        <!-- End Opsi Pengingat -->
 
                         <label for="editEventDescription" style="margin-top: 0.5rem;">Deskripsi/Lokasi</label>
                         <input type="text" id="editEventDescription" name="deskripsi"
@@ -249,12 +305,12 @@
                                 <span class="reminder-title">Waktu Pengingat</span>
                                 <div class="reminder-items">
                                     <div class="radio-option">
-                                        <input type="radio" name="reminder_option" value="on_day" id="reminder_on_day"
-                                            checked>
+                                        <input type="radio" name="reminder_option" value="on_day" id="reminder_on_day">
                                         <label for="reminder_on_day">Pada hari kegiatan</label>
                                     </div>
                                     <div class="radio-option">
-                                        <input type="radio" name="reminder_option" value="1_day" id="reminder_1_day">
+                                        <input type="radio" name="reminder_option" value="1_day" id="reminder_1_day"
+                                            checked>
                                         <label for="reminder_1_day">1 hari sebelumnya</label>
                                     </div>
                                     <div class="radio-option">
@@ -276,16 +332,7 @@
                             <div id="customReminder" class="custom-reminder" style="display: none;">
                                 <input type="number" id="custom_days" min="0" max="30" placeholder="Hari"
                                     class="input-field">
-                                <select id="custom_time" class="input-field">
-                                    <option value="09:00">09:00</option>
-                                    <option value="10:00">10:00</option>
-                                    <option value="11:00">11:00</option>
-                                    <option value="12:00">12:00</option>
-                                    <option value="13:00">13:00</option>
-                                    <option value="14:00">14:00</option>
-                                    <option value="15:00">15:00</option>
-                                    <option value="16:00">16:00</option>
-                                </select>
+                                <input type="time" id="custom_time" class="input-field" />
                             </div>
 
                             <div id="selectedReminders" class="selected-reminders">
@@ -322,7 +369,9 @@
     const USER_CAN_CHANGE_KEGIATAN = {% if perms.kalender.change_kegiatan %}true{% else %} false{% endif %};
     const USER_CAN_DELETE_KEGIATAN = {% if perms.kalender.delete_kegiatan %}true{% else %} false{% endif %};
     const USER_CAN_ADD_NOTIFIKASI = {% if perms.kalender.add_notifikasi %}true{% else %} false{% endif %};
-
+    const USER_CAN_ADD_SELF_KEGIATAN = {% if can_add_self_kegiatan %}true{% else %} false{% endif %};
+    const USER_CAN_ADD_PUBLIC_KEGIATAN = {% if can_add_public_kegiatan %}true{% else %} false{% endif %};
+    
     // Elemen DOM untuk Kalender dan Agenda
     /** Elemen untuk kalender dan daftar agenda */
     const calendarEl = document.getElementById('calendar');
@@ -683,21 +732,44 @@
     });
 }
 
-    /** Membuka modal untuk menambah kegiatan baru */
+    /** Modal untuk menambah kegiatan baru */
     window.openModal = function () {
-        loadCategories(eventCategory);
-        loadOrmawa(document.getElementById('eventOrmawa'));
         eventForm.reset();
-        document.getElementById('eventIsPublic').checked = true;
+        document.getElementById('eventIsPublic').checked = true; // Default section Ormawa
+        document.getElementById('eventReminderEnable').checked = true;
+        document.getElementById('eventReminderDays').value = '1';
         eventDays.value = '';
 
-        const ormawaPublicSection = document.getElementById('ormawaPublicSection');
-        if (ormawaPublicSection) {
-            ormawaPublicSection.style.display = isLeader ? 'block' : 'none';
-        }
+        // Muat data kategori yang selalu dibutuhkan
+        loadCategories(eventCategory);
 
+        // Ambil elemen DOM untuk section-section pilihan
+        const ormawaPublicSection = document.getElementById('ormawaPublicSection');
+        const publicSelfChoiceSection = document.getElementById('publicSelfChoiceSection');
+
+        // Section pilihan disembunyikan terlebih dahulu
+        if (ormawaPublicSection) ormawaPublicSection.style.display = 'none';
+        if (publicSelfChoiceSection) publicSelfChoiceSection.style.display = 'none';
+
+        // --- Tampilkan section yang sesuai berdasarkan peran ---
+        if (isLeader) {
+            // Jika pengguna adalah leader Ormawa, tampilkan section untuk memilih Ormawa
+            loadOrmawa(document.getElementById('eventOrmawa'));
+            if (ormawaPublicSection) ormawaPublicSection.style.display = 'block';
+
+        } else if (USER_CAN_ADD_PUBLIC_KEGIATAN && USER_CAN_ADD_SELF_KEGIATAN) {
+            // Jika pengguna punya izin ganda (publik & pribadi) tapi bukan leader,
+            // tampilkan pilihan checkbox untuk menentukan visibilitas.
+            if (publicSelfChoiceSection) {
+                publicSelfChoiceSection.style.display = 'block';
+                // Set default ke publik sesuai permintaan
+                document.getElementById('eventIsPublicChoice').checked = true;
+            }
+        }
+        // Tampilkan modal setelah semua persiapan selesai
         modal.classList.add('show');
-    }
+    };
+
 
     /** Menutup modal tambah kegiatan */
     function closeModal() {
@@ -746,6 +818,9 @@
         });
 
         document.getElementById('editEventIsPublic').checked = isPublic === true || isPublic === 'true';
+        document.getElementById('editEventReminderEnable').checked = true;
+        document.getElementById('editEventReminderDays').value = '1';
+        document.getElementById('editCustomReminder').style.display = 'none';
 
         const editOrmawaPublicSection = document.getElementById('editOrmawaPublicSection');
         if (editOrmawaPublicSection) {
@@ -956,6 +1031,23 @@
         const addReminderBtn = document.getElementById('addReminder');
         const selectedReminders = document.getElementById('selectedReminders');
 
+        // Event listener untuk pengaturan pengingat pada modal tambah kegiatan
+        const eventReminderDays = document.getElementById('eventReminderDays');
+        if (eventReminderDays && customReminder) {
+            eventReminderDays.addEventListener('change', function () {
+                customReminder.style.display = this.value === 'custom' ? 'block' : 'none';
+            });
+        }
+
+        // Event listener untuk pengaturan pengingat pada modal edit kegiatan
+        const editEventReminderDays = document.getElementById('editEventReminderDays');
+        const editCustomReminder = document.getElementById('editCustomReminder');
+        if (editEventReminderDays && editCustomReminder) {
+            editEventReminderDays.addEventListener('change', function () {
+                editCustomReminder.style.display = this.value === 'custom' ? 'block' : 'none';
+            });
+        }
+
         if (reminderOptions.length > 0) {
             reminderOptions.forEach(option => {
                 option.addEventListener('change', function () {
@@ -1079,6 +1171,7 @@
         eventForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // data form
             const nama = document.getElementById('eventTitle').value.trim();
             const start = document.getElementById('eventStart').value;
             let end = document.getElementById('eventEnd').value;
@@ -1086,19 +1179,62 @@
             const endTime = document.getElementById('eventEndTime').value || '23:59';
             const kategori_id = document.getElementById('eventCategory').value;
             const deskripsi = document.getElementById('eventDescription').value.trim();
-            const is_public = isLeader ? document.getElementById('eventIsPublic').checked : true;
-            const ormawa_id = isLeader ? document.getElementById('eventOrmawa').value || null : null;
             const notify_email = document.getElementById('eventNotifyEmail').checked;
             const notify_whatsapp = document.getElementById('eventNotifyWhatsApp').checked;
-            const notify_to = isLeader ? (is_public ? 'all' : 'ormawa') : 'all';
 
+            // Validasi input dasar
             if (!nama || !start || !kategori_id) {
                 showCustomAlert('Nama kegiatan, tanggal mulai, dan kategori wajib diisi.', 'error');
                 return;
             }
 
-            if (isLeader && !ormawa_id) {
-                showCustomAlert('Ormawa wajib dipilih untuk ketua atau sekretaris.', 'error');
+            // data reminder
+            const reminder_enable = document.getElementById('eventReminderEnable').checked;
+            const reminder_days_select = document.getElementById('eventReminderDays');
+            const reminder_days = reminder_days_select ? reminder_days_select.value : null;
+            let reminders = [];
+            if (reminder_enable && reminder_days) {
+                reminders.push({ days: parseInt(reminder_days), time: startTime });
+            }
+
+            // Menentukan parameter khusus berdasarkan peran 
+            let is_public;
+            let ormawa_id = null; // Selalu mulai dengan null
+            let notify_to;
+
+            if (isLeader) {
+                // Kasus 1: Pengguna adalah Leader Ormawa. Baca dari section Ormawa.
+                ormawa_id = document.getElementById('eventOrmawa').value || null;
+                if (!ormawa_id) {
+                    showCustomAlert('Ormawa wajib dipilih untuk ketua atau sekretaris.', 'error');
+                    return;
+                }
+                is_public = document.getElementById('eventIsPublic').checked;
+                notify_to = is_public ? 'all' : 'ormawa';
+
+            } else if (USER_CAN_ADD_PUBLIC_KEGIATAN && USER_CAN_ADD_SELF_KEGIATAN) {
+                // Kasus 2: Pengguna punya izin ganda. Baca dari checkbox pilihan.
+                const isPublicChoice = document.getElementById('eventIsPublicChoice').checked;
+                if (isPublicChoice) {
+                    is_public = true;
+                    notify_to = 'all';
+                } else {
+                    is_public = false;
+                    notify_to = 'self';
+                }
+
+            } else if (USER_CAN_ADD_PUBLIC_KEGIATAN) {
+                // Kasus 3: Pengguna HANYA punya izin publik. Paksa jadi publik.
+                is_public = true;
+                notify_to = 'all';
+
+            } else if (USER_CAN_ADD_SELF_KEGIATAN) {
+                // Kasus 4: Pengguna HANYA punya izin pribadi. Paksa jadi pribadi.
+                is_public = false;
+                notify_to = 'self';
+            } else {
+                // Fallback jika terjadi kesalahan izin
+                showCustomAlert('Anda tidak memiliki izin untuk melakukan aksi ini.', 'error');
                 return;
             }
 
@@ -1107,6 +1243,8 @@
             const startDate = new Date(`${start}T${startTime}:00+07:00`);
             const endDate = new Date(`${end}T${endTime}:00+07:00`);
 
+
+            // Validasi tanggal
             const newEvent = {
                 nama,
                 start: startDate.toISOString(),
@@ -1115,26 +1253,27 @@
                 deskripsi,
                 is_public,
                 ormawa_id,
+                notify_to,
                 notify_email,
                 notify_whatsapp,
-                notify_to
+                reminders
             };
 
+            // Mengirim data ke backend
             try {
                 const response = await fetch('/api/events/add/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
                     body: JSON.stringify(newEvent)
                 });
-
+                const result = await response.json();
                 if (response.ok) {
-                    showCustomAlert('Kegiatan berhasil ditambahkan!', 'success');
+                    showCustomAlert(result.message || 'Kegiatan berhasil ditambahkan!', 'success');
                     calendar.refetchEvents();
                     filterAgenda();
                     closeModal();
                 } else {
-                    const errorData = await response.json();
-                    showCustomAlert('Gagal menambahkan kegiatan: ' + (errorData.error || JSON.stringify(errorData)), 'error');
+                    showCustomAlert('Gagal menambahkan kegiatan: ' + (result.error || JSON.stringify(result)), 'error');
                 }
             } catch (err) {
                 showCustomAlert('Terjadi kesalahan koneksi saat menambahkan kegiatan.', 'error');
@@ -1162,6 +1301,24 @@
             const notify_email = document.getElementById('editEventNotifyEmail').checked;
             const notify_whatsapp = document.getElementById('editEventNotifyWhatsApp').checked;
             const notify_to = isLeader ? (is_public ? 'all' : 'ormawa') : 'all';
+            const reminder_enable = document.getElementById('editEventReminderEnable').checked;
+            const reminder_days = document.getElementById('editEventReminderDays').value;
+            let reminders = [];
+
+            if (reminder_enable) {
+                if (reminder_days === 'custom') {
+                    const custom_days = document.getElementById('editCustomReminderDays').value;
+                    const custom_time = document.getElementById('editCustomReminderTime').value || startTime;
+                    if (custom_days && custom_time) {
+                        reminders.push({ days: parseInt(custom_days), time: custom_time });
+                    } else {
+                        showCustomAlert('Silakan isi hari dan waktu untuk pengingat custom.', 'error');
+                        return;
+                    }
+                } else {
+                    reminders.push({ days: parseInt(reminder_days), time: startTime });
+                }
+            }
 
             if (!nama || !start || !kategori_id) {
                 showCustomAlert('Nama kegiatan, tanggal mulai, dan kategori wajib diisi.', 'error');
@@ -1191,7 +1348,8 @@
                 ormawa_id,
                 notify_email,
                 notify_whatsapp,
-                notify_to // Tambahkan ini
+                notify_to,
+                reminders
             };
 
             try {

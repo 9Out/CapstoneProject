@@ -86,7 +86,6 @@
 - Buat admin dengan kode berikut:
   ```bash
   python manage.py createsuperuser
-  python manage.py populate_kalender //Opsional isi database otomatis periode 2023/2024-2024/2025
   ```
 
 ### 7. Jalankan Komponen Proyek

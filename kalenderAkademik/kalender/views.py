@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
 from .serializers import KegiatanSerializer, KategoriSerializer
 from rest_framework import status
@@ -31,9 +31,9 @@ def category_list(request):
     serializer = KategoriSerializer(categories, many=True)
     return Response(serializer.data)
 
-@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@csrf_exempt
 def add_kegiatan(request):
     try:
         data = request.data
@@ -42,17 +42,17 @@ def add_kegiatan(request):
         tgl_mulai = parse_datetime(data.get('start'))
         tgl_selesai = parse_datetime(data.get('end')) if data.get('end') else tgl_mulai.replace(hour=23, minute=59, second=59)
         kategori_id = data.get('kategori_id')
-        semester = data.get('semester', 'Ganjil') 
+        semester = data.get('semester', 'Ganjil')
         is_public = data.get('is_public', True)
         ormawa_id = data.get('ormawa_id')
         notify_to = data.get('notify_to', 'all' if is_public else 'ormawa')
         notify_email = data.get('notify_email', True)
         notify_whatsapp = data.get('notify_whatsapp', False)
-        
-        is_leader = Ormawa.objects.filter(user=request.user, ketua=request.user).exists() or Ormawa.objects.filter(user=request.user, sekretaris=user).exists()
-        
+        reminders = data.get('reminders', [])
+
+        is_leader = Ormawa.objects.filter(user=request.user, ketua=request.user).exists() or Ormawa.objects.filter(user=request.user, sekretaris=request.user).exists()
+
         if is_leader and ormawa_id:
-            # Jika user adalah ketua atau sekretaris Ormawa, gunakan kategori Ormawa
             try:
                 ormawa_category = Kategori.objects.get(nama='Ormawa', is_ormawa=True)
                 kategori_id = ormawa_category.id
@@ -61,7 +61,7 @@ def add_kegiatan(request):
                     {'success': False, 'error': 'Kategori Ormawa tidak ditemukan'},
                     status=status.HTTP_404_NOT_FOUND
                 )
-                
+
         if not all([nama, tgl_mulai, kategori_id]):
             return Response(
                 {'success': False, 'error': 'Nama, tanggal mulai, dan kategori wajib diisi'},
@@ -117,7 +117,7 @@ def add_kegiatan(request):
                 kategori_fk=kategori,
                 is_public=is_public,
                 ormawa_fk=ormawa
-            )  
+            )
 
             User = get_user_model()
             if notify_to == 'all':
@@ -132,92 +132,152 @@ def add_kegiatan(request):
 
             for user in users:
                 if notify_email:
-                    notifikasi = Notifikasi.objects.create(
+                    notifikasi, created = Notifikasi.objects.get_or_create(
                         user_fk=user,
                         kegiatan_fk=kegiatan,
                         metode='email',
-                        status='Pending',
-                        action_type='create'
+                        defaults={'status': 'Pending', 'action_type': 'create', 'reminders': reminders if reminders else None}
                     )
-                    transaction.on_commit(lambda: send_email_notification.delay(notifikasi.id))
+                    if not created:
+                        notifikasi.status = 'Pending'
+                        notifikasi.action_type = 'create'
+                        notifikasi.reminders = reminders if reminders else None
+                        notifikasi.save()
+                    transaction.on_commit(lambda n=notifikasi.id: send_email_notification.delay(n))
+                    if reminders:
+                        transaction.on_commit(lambda: check_notifications.delay())
+
                 if notify_whatsapp:
-                    notifikasi = Notifikasi.objects.create(
+                    notifikasi, created = Notifikasi.objects.get_or_create(
                         user_fk=user,
                         kegiatan_fk=kegiatan,
                         metode='whatsapp',
-                        status='Pending',
-                        action_type='create'
+                        defaults={'status': 'Pending', 'action_type': 'create', 'reminders': reminders if reminders else None}
                     )
-                    transaction.on_commit(lambda: send_whatsapp_notification.delay(notifikasi.id))
+                    if not created:
+                        notifikasi.status = 'Pending'
+                        notifikasi.action_type = 'create'
+                        notifikasi.reminders = reminders if reminders else None
+                        notifikasi.save()
+                    # Hanya panggil send_whatsapp_notification untuk notifikasi awal jika tidak ada reminders
+                    if not reminders or not any(r.get('days', 0) > 0 or r.get('time') != '00:00' for r in reminders):
+                        transaction.on_commit(lambda n=notifikasi.id: send_whatsapp_notification.delay(n))
+                    if reminders:
+                        transaction.on_commit(lambda: check_notifications.delay())
 
         return Response(
             {'success': True, 'message': 'Kegiatan berhasil ditambahkan'},
             status=status.HTTP_201_CREATED
         )
-
     except Exception as e:
         return Response(
             {'success': False, 'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @csrf_exempt
-def save_notification(request):
+def add_kegiatan(request):
+    data = request.data
+    user = request.user
+
+    # Ambil parameter kunci dari frontend untuk menentukan intensi
+    ormawa_id = data.get('ormawa_id')
+    notify_to = data.get('notify_to') # 'ormawa', 'all', atau 'self'
+    
+    # Inisialisasi variabel
+    ormawa = None
+    kategori = None
+    is_public = data.get('is_public', False) # Ambil nilai dari frontend, akan diverifikasi
+
+    # --- Verifikasi Izin Berdasarkan Intensi dari Frontend ---
     try:
-        data = request.data
-        kegiatan_id = data.get('kegiatan_id')
-        metode = data.get('metode')
-        one_day_before = data.get('one_day_before', False)
-        one_hour_before = data.get('one_hour_before', False)
+        if ormawa_id:
+            # 1. Intensi: Membuat kegiatan Ormawa
+            ormawa = get_object_or_404(Ormawa, id=ormawa_id)
+            if not (user == ormawa.ketua or user == ormawa.sekretaris):
+                return Response({'success': False, 'error': 'Hanya ketua/sekretaris yang boleh menambah kegiatan untuk Ormawa ini.'}, status=status.HTTP_403_FORBIDDEN)
+            kategori = get_object_or_404(Kategori, nama='Ormawa', is_ormawa=True)
+            # is_public dan notify_to sudah diatur dengan benar dari frontend
 
-        if not kegiatan_id or metode not in ['email', 'whatsapp']:
-            return Response({'success': False, 'error': 'Kegiatan ID dan metode valid diperlukan'}, status=status.HTTP_400_BAD_REQUEST)
+        elif notify_to == 'self':
+            # 2. Intensi: Membuat kegiatan pribadi
+            if not user.has_perm('kalender.add_kegiatan_self'):
+                return Response({'success': False, 'error': 'Anda tidak memiliki izin untuk menambah kegiatan pribadi.'}, status=status.HTTP_403_FORBIDDEN)
+            is_public = False  # Paksa False di backend untuk keamanan
+            ormawa = None
+            kategori = get_object_or_404(Kategori, id=data.get('kategori_id'))
 
-        kegiatan = Kegiatan.objects.get(id=kegiatan_id)
-        user = request.user
+        elif notify_to == 'all':
+            # 3. Intensi: Membuat kegiatan publik
+            if not user.has_perm('kalender.add_kegiatan'):
+                return Response({'success': False, 'error': 'Anda tidak memiliki izin untuk menambah kegiatan publik.'}, status=status.HTTP_403_FORBIDDEN)
+            is_public = True  # Paksa True di backend untuk keamanan
+            ormawa = None
+            kategori = get_object_or_404(Kategori, id=data.get('kategori_id'))
+        
+        else:
+            return Response({'success': False, 'error': 'Tipe kegiatan tidak valid atau tidak diizinkan.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validasi akses user is_public dan keanggotaan Ormawa
-        if not kegiatan.is_public:
-            if not kegiatan.ormawa_fk or user not in kegiatan.ormawa_fk.user.all():
-                return Response(
-                    {'success': False, 'error': 'Anda tidak memiliki akses untuk membuat notifikasi untuk kegiatan ini'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+    except (Kategori.DoesNotExist):
+        return Response({'success': False, 'error': 'Kategori tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
 
-        existing_notification = Notifikasi.objects.filter(
-            user_fk=user,
-            kegiatan_fk=kegiatan,
-            metode=metode
-        ).first()
+    # --- Lanjutkan validasi dan pembuatan objek ---
+    nama = data.get('nama')
+    tgl_mulai_str = data.get('start')
+    if not all([nama, tgl_mulai_str]):
+        return Response({'success': False, 'error': 'Nama dan tanggal mulai wajib diisi.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    try:
+        tgl_mulai = parse_datetime(tgl_mulai_str)
+        tgl_selesai = parse_datetime(data.get('end')) if data.get('end') else tgl_mulai.replace(hour=23, minute=59, second=59)
+        if tgl_selesai < tgl_mulai:
+            return Response({'success': False, 'error': 'Tanggal selesai tidak boleh sebelum tanggal mulai.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if existing_notification:
-            return Response(
-                {'success': False, 'error': f'Notifikasi dengan metode {metode} sudah ada untuk kegiatan ini. Anda dapat mengedit notifikasi yang ada.'},
-                status=status.HTTP_400_BAD_REQUEST
+        with transaction.atomic():
+            kegiatan = Kegiatan.objects.create(
+                nama=nama,
+                deskripsi=data.get('deskripsi', ''),
+                tgl_mulai=tgl_mulai,
+                tgl_selesai=tgl_selesai,
+                user_fk=user,
+                kategori_fk=kategori,
+                is_public=is_public,
+                ormawa_fk=ormawa
             )
 
-        notifikasi = Notifikasi.objects.create(
-            user_fk=user,
-            kegiatan_fk=kegiatan,
-            metode=metode,
-            status='Pending',
-            one_day_before=one_day_before,
-            one_hour_before=one_hour_before
-        )
+            # --- Logika Notifikasi Terpusat ---
+            User = get_user_model()
+            users_to_notify = []
+            if notify_to == 'all':
+                users_to_notify = User.objects.all()
+            elif notify_to == 'ormawa' and kegiatan.ormawa_fk:
+                users_to_notify = kegiatan.ormawa_fk.user.all()
+            elif notify_to == 'self':
+                users_to_notify = [user]
 
-        if metode == 'email':
-            send_email_notification.delay(notifikasi.id)
-        elif metode == 'whatsapp':
-            send_whatsapp_notification.delay(notifikasi.id)
+            notify_email = data.get('notify_email', False)
+            notify_whatsapp = data.get('notify_whatsapp', False)
+            reminders = data.get('reminders', [])
 
-        return Response({'success': True, 'message': f'Notifikasi dengan metode {metode} berhasil disimpan'})
+            for target_user in users_to_notify:
+                if notify_email:
+                    notif = Notifikasi.objects.create(user_fk=target_user, kegiatan_fk=kegiatan, metode='email', reminders=reminders, action_type='create')
+                    transaction.on_commit(lambda n_id=notif.id: send_email_notification.delay(n_id))
 
-    except Kegiatan.DoesNotExist:
-        return Response({'success': False, 'error': 'Kegiatan tidak ditemukan'}, status=status.HTTP_404_NOT_FOUND)
+                if notify_whatsapp:
+                    notif = Notifikasi.objects.create(user_fk=target_user, kegiatan_fk=kegiatan, metode='whatsapp', reminders=reminders, action_type='create')
+                    transaction.on_commit(lambda n_id=notif.id: send_whatsapp_notification.delay(n_id))
+
+            if reminders and (notify_email or notify_whatsapp):
+                transaction.on_commit(check_notifications.delay)
+
+        return Response({'success': True, 'message': 'Kegiatan berhasil ditambahkan'}, status=status.HTTP_201_CREATED)
+
     except Exception as e:
-        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'success': False, 'error': f'Terjadi kesalahan: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class KegiatanListView(generics.ListAPIView):
     serializer_class = KegiatanSerializer
@@ -237,9 +297,12 @@ class KegiatanListView(generics.ListAPIView):
         # - Kegiatan publik (is_public=True)
         # - Kegiatan tidak publik (is_public=False) yang user adalah anggota Ormawa-nya
         if user.is_authenticated:
+            user_ormawa = Ormawa.objects.filter(user=user)
             queryset = queryset.filter(
-                Q(is_public=True) | (Q(is_public=False) & Q(ormawa_fk__in=user_ormawa))
-            )
+            Q(is_public=True) |
+            Q(is_public=False, ormawa_fk__in=user_ormawa) |
+            Q(is_public=False, ormawa_fk__isnull=True, user_fk=user)
+        ).distinct()
         else:
             # Jika user tidak login, hanya tampilkan kegiatan publik
             queryset = queryset.filter(is_public=True)
@@ -325,13 +388,13 @@ def update_kegiatan(request, id):
         notify_to = data.get('notify_to', 'all' if is_public else 'ormawa')
         notify_email = data.get('notify_email', True)
         notify_whatsapp = data.get('notify_whatsapp', False)
+        reminders = data.get('reminders', [])
 
         is_leader = kegiatan.ormawa_fk and (
             request.user == kegiatan.ormawa_fk.ketua or request.user == kegiatan.ormawa_fk.sekretaris
         )
 
         if is_leader and ormawa_id:
-            # kategori menjadi "Ormawa"
             try:
                 ormawa_category = Kategori.objects.get(nama='Ormawa', is_ormawa=True)
                 kategori_id = ormawa_category.id
@@ -408,43 +471,39 @@ def update_kegiatan(request, id):
                 )
 
             for user in users:
-                notifikasi_list = Notifikasi.objects.filter(user_fk=user, kegiatan_fk=kegiatan)
-                
                 if notify_email:
-                    notifikasi_email = notifikasi_list.filter(metode='email').first()
-                    if notifikasi_email:
-                        notifikasi_email.status = 'Pending'
-                        notifikasi_email.action_type = 'update'
-                        notifikasi_email.save()
-                    else:
-                        notifikasi_email = Notifikasi.objects.create(
-                            user_fk=user,
-                            kegiatan_fk=kegiatan,
-                            metode='email',
-                            status='Pending',
-                            action_type='update'
-                        )
-                    transaction.on_commit(lambda: send_email_notification.delay(notifikasi_email.id))
-                else:
-                    notifikasi_list.filter(metode='email').delete()
+                    notifikasi, created = Notifikasi.objects.get_or_create(
+                        user_fk=user,
+                        kegiatan_fk=kegiatan,
+                        metode='email',
+                        defaults={'status': 'Pending', 'action_type': 'update', 'reminders': reminders if reminders else None}
+                    )
+                    if not created:
+                        notifikasi.status = 'Pending'
+                        notifikasi.action_type = 'update'
+                        notifikasi.reminders = reminders if reminders else None
+                        notifikasi.save()
+                    # Panggil task untuk setiap notifikasi secara individual
+                    transaction.on_commit(lambda n=notifikasi.id: send_email_notification.delay(n))
+                    if reminders:
+                        transaction.on_commit(lambda: check_notifications.delay())
 
                 if notify_whatsapp:
-                    notifikasi_whatsapp = notifikasi_list.filter(metode='whatsapp').first()
-                    if notifikasi_whatsapp:
-                        notifikasi_whatsapp.status = 'Pending'
-                        notifikasi_whatsapp.action_type = 'update'
-                        notifikasi_whatsapp.save()
-                    else:
-                        notifikasi_whatsapp = Notifikasi.objects.create(
-                            user_fk=user,
-                            kegiatan_fk=kegiatan,
-                            metode='whatsapp',
-                            status='Pending',
-                            action_type='update'
-                        )
-                    transaction.on_commit(lambda: send_whatsapp_notification.delay(notifikasi_whatsapp.id))
-                else:
-                    notifikasi_list.filter(metode='whatsapp').delete()
+                    notifikasi, created = Notifikasi.objects.get_or_create(
+                        user_fk=user,
+                        kegiatan_fk=kegiatan,
+                        metode='whatsapp',
+                        defaults={'status': 'Pending', 'action_type': 'update', 'reminders': reminders if reminders else None}
+                    )
+                    if not created:
+                        notifikasi.status = 'Pending'
+                        notifikasi.action_type = 'update'
+                        notifikasi.reminders = reminders if reminders else None
+                        notifikasi.save()
+                    # Panggil task untuk setiap notifikasi secara individual
+                    transaction.on_commit(lambda n=notifikasi.id: send_whatsapp_notification.delay(n))
+                    if reminders:
+                        transaction.on_commit(lambda: check_notifications.delay())
 
         return Response(
             {'success': True, 'message': 'Kegiatan berhasil diperbarui dan notifikasi diperbarui'},
@@ -583,7 +642,6 @@ def save_notification_reminders(request):
 @permission_classes([IsAuthenticated])
 def user_ormawa_list(request):
     try:
-        # Ambil daftar Ormawa tempat user menjadi anggota
         ormawa_list = Ormawa.objects.filter(user=request.user)
         ormawa_data = []
         is_leader = False  #
@@ -607,16 +665,26 @@ def user_ormawa_list(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 def kalender(request):
     is_leader = False
-    if request.user.is_authenticated:
-        ormawa_list = Ormawa.objects.filter(user=request.user)
-        for ormawa in ormawa_list:
-            if request.user == ormawa.ketua or request.user == ormawa.sekretaris:
-                is_leader = True
-                break
+    can_add_self_kegiatan = False
+    can_add_public_kegiatan = False 
 
-    return render(request, 'kalender/kalenderAkademik.html', {
+    if request.user.is_authenticated:
+        if Ormawa.objects.filter(Q(ketua=request.user) | Q(sekretaris=request.user)).exists():
+            is_leader = True
+
+        if request.user.has_perm('kalender.add_kegiatan_self'):
+            can_add_self_kegiatan = True
+            
+        if request.user.has_perm('kalender.add_kegiatan'):
+            can_add_public_kegiatan = True
+
+    context = {
         'user_id': request.user.id if request.user.is_authenticated else None,
         'is_leader': is_leader, 
-    })
+        'can_add_self_kegiatan': can_add_self_kegiatan,
+        'can_add_public_kegiatan': can_add_public_kegiatan, # BARU
+    }
+    return render(request, 'kalender/kalenderAkademik.html', context)
